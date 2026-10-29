@@ -25,7 +25,6 @@ def findActiveBySerial(db: Session, serialNumber: str) -> RepairOrder | None:
         .first()
     )
 
-
 def create(db: Session, repair: RepairOrder) -> RepairOrder:
     db.add(repair)
     db.commit()
