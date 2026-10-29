@@ -2,3 +2,4 @@ from app.modules.auth.models import Permission, Role, User, rolePermission  # no
 from app.modules.client.models import Client  # noqa: F401
 from app.modules.order.models import Order  # noqa: F401
 from app.modules.material.models import Material  # noqa: F401
+from app.modules.printOrder.models import MaterialUsage, Object3D, PrintOrder  # noqa: F401

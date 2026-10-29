@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from sqlalchemy import text
 from app.modules.auth.router import router as authRouter
 from app.modules.material.router import router as materialRouter
+from app.modules.printOrder.router import router as printOrderRouter
 
 import app.models  # noqa: F401
 from app.core.database import Base, engine
@@ -29,3 +30,6 @@ app.include_router(authRouter)
 
 #router de material
 app.include_router(materialRouter)
+
+#router de orden print
+app.include_router(printOrderRouter)
