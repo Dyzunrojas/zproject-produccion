@@ -1,17 +1,34 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
+
+from app import models  # noqa: F401
+from app.core.config import settings
+from app.core.database import Base, engine
 from app.modules.auth.router import router as authRouter
 from app.modules.material.router import router as materialRouter
 from app.modules.printOrder.router import router as printOrderRouter
-from app.modules.warranty.router import router as warrantyRouter
 from app.modules.tool.router import router as toolRouter
-
-import app.models  # noqa: F401
-from app.core.database import Base, engine
+from app.modules.warranty.router import router as warrantyRouter
 
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="ZProject")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.corsOrigins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+app.include_router(authRouter)
+app.include_router(materialRouter)
+app.include_router(printOrderRouter)
+app.include_router(warrantyRouter)
+app.include_router(toolRouter)
 
 
 @app.get("/")
@@ -24,18 +41,3 @@ def healthDb():
     with engine.connect() as conn:
         conn.execute(text("SELECT 1"))
     return {"database": "ok"}
-
-#router de autorizacion
-app.include_router(authRouter)
-
-#router de material
-app.include_router(materialRouter)
-
-#router de orden print
-app.include_router(printOrderRouter)
-
-#router de garantia
-app.include_router(warrantyRouter)
-
-#router de herramienta
-app.include_router(toolRouter)
