@@ -1,0 +1,30 @@
+from datetime import date, datetime
+from typing import TYPE_CHECKING
+
+from sqlalchemy import Date, DateTime, ForeignKey, String, func
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from app.core.database import Base
+
+if TYPE_CHECKING:
+    from app.modules.client.models import Client
+
+
+class Order(Base):
+    # "order" no se puede porque es comando, asi que se pone asi
+    __tablename__ = "client_order"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    orderType: Mapped[str] = mapped_column(String(20))  # "print" o "repair"
+    clientId: Mapped[int] = mapped_column(ForeignKey("client.id"))
+    status: Mapped[str] = mapped_column(String(20), default="pending")
+    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+    estimatedDeliveryDate: Mapped[date] = mapped_column(Date)
+    deliveryDate: Mapped[date | None] = mapped_column(Date, default=None)
+
+    client: Mapped["Client"] = relationship(back_populates="orders")
+
+    __mapper_args__ = {
+        "polymorphic_on": "orderType",
+        "polymorphic_identity": "order",
+    }
