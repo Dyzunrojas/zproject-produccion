@@ -1,0 +1,1 @@
+from app.modules.auth.models import Permission, Role, User, rolePermission  # noqa: F401

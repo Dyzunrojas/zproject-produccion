@@ -1,0 +1,25 @@
+from fastapi import FastAPI
+from sqlalchemy import text
+from app.modules.auth.router import router as authRouter
+
+import app.models  # noqa: F401
+from app.core.database import Base, engine
+
+Base.metadata.create_all(bind=engine)
+
+app = FastAPI(title="ZProject")
+
+
+@app.get("/")
+def root():
+    return {"message": "ZProject API funcionando"}
+
+
+@app.get("/health/db")
+def healthDb():
+    with engine.connect() as conn:
+        conn.execute(text("SELECT 1"))
+    return {"database": "ok"}
+
+app = FastAPI(title="ZProject")
+app.include_router(authRouter)
