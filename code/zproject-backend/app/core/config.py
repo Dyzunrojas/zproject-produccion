@@ -7,6 +7,8 @@ class Settings(BaseSettings):
     secretKey: str = Field(alias="SECRET_KEY")
     algorithm: str = "HS256"
     accessTokenMinutes: int = 60
+    uploadDir: str = "uploads"
+    maxStlMb: int = 50
 
     model_config = SettingsConfigDict(env_file=".env")
 

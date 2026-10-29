@@ -17,6 +17,18 @@ class Object3DResponse(BaseModel):
     stlFilePath: str | None
 
 
+class MaterialUsageCreate(BaseModel):
+    materialId: int
+    gramsUsed: float = Field(gt=0)
+
+
+class MaterialUsageResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    materialId: int
+    gramsUsed: float
+
+
 class PrintOrderCreate(BaseModel):
     clientId: int
     estimatedDeliveryDate: date
@@ -25,6 +37,11 @@ class PrintOrderCreate(BaseModel):
 
 class PrintOrderUpdate(BaseModel):
     estimatedDeliveryDate: date | None = None
+
+
+class PrintOrderFinalize(BaseModel):
+    deliveryDate: date | None = None  # si no se manda, se usa la fecha de hoy
+    materialsUsed: list[MaterialUsageCreate] = []
 
 
 class PrintOrderResponse(BaseModel):
@@ -37,3 +54,4 @@ class PrintOrderResponse(BaseModel):
     estimatedDeliveryDate: date
     deliveryDate: date | None
     objects: list[Object3DResponse]
+    materialUsages: list[MaterialUsageResponse]
