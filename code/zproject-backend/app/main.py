@@ -6,6 +6,7 @@ from app import models  # noqa: F401
 from app.core.config import settings
 from app.core.database import Base, engine
 from app.modules.auth.router import router as authRouter
+from app.modules.client.router import router as clientRouter
 from app.modules.material.router import router as materialRouter
 from app.modules.printOrder.router import router as printOrderRouter
 from app.modules.repairs.router import router as repairsRouter
@@ -27,6 +28,7 @@ app.add_middleware(
 
 
 app.include_router(authRouter)
+app.include_router(clientRouter)
 app.include_router(materialRouter)
 app.include_router(printOrderRouter)
 app.include_router(warrantyRouter)

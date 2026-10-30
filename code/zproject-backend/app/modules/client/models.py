@@ -16,5 +16,6 @@ class Client(Base):
     name: Mapped[str] = mapped_column(String(100))
     phone: Mapped[str] = mapped_column(String(20), default="")
     email: Mapped[str] = mapped_column(String(100), default="")
+    isActive: Mapped[bool] = mapped_column(default=True)
 
     orders: Mapped[list["Order"]] = relationship(back_populates="client")
