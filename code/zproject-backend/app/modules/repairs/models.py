@@ -10,7 +10,7 @@ from app.modules.order.models import Order
 
 if TYPE_CHECKING:
     from app.modules.client.models import Client
-    from app.modules.spare_parts.models import SparePartUsage
+    from app.modules.sparePart.models import SparePartUsage
 
 RECEIVED = "recibido"
 DIAGNOSED = "diagnosticado"

@@ -14,7 +14,7 @@ from app.modules.repairs.schemas import (
     RepairStatusChange,
     RepairUpdate,
 )
-from app.modules.spare_parts import service as sparePartService
+from app.modules.sparePart import service as sparePartService
 
 
 def getRepairs(db: Session, status: str | None = None, clientId: int | None = None) -> list[RepairOrder]:

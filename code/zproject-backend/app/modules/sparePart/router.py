@@ -2,9 +2,8 @@ from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
 from app.core.dependencies import getDb, requirePermission
-from app.modules.spare_parts import service
-from app.modules.spare_parts.schemas import SparePartCreate, SparePartResponse, SparePartUpdate
-
+from app.modules.sparePart import service
+from app.modules.sparePart.schemas import SparePartCreate, SparePartResponse, SparePartUpdate
 router = APIRouter(prefix="/spare-parts", tags=["spare-parts"])
 
 
