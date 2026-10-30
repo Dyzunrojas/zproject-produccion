@@ -1,14 +1,34 @@
 import { Route, Routes } from "react-router-dom";
+import { AppLayout } from "./components/templates/AppLayout";
+import { ForbiddenPage } from "./pages/ForbiddenPage";
 import { HomePage } from "./pages/HomePage";
 import { LoginPage } from "./pages/LoginPage";
+import { MaterialsPage } from "./pages/MaterialsPage";
+import { NotFoundPage } from "./pages/NotFoundPage";
+import { PrintOrdersPage } from "./pages/PrintOrdersPage";
 import { ProtectedRoute } from "./routes/ProtectedRoute";
+import { RequirePermission } from "./routes/RequirePermission";
 
 function App() {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
+
       <Route element={<ProtectedRoute />}>
-        <Route path="/" element={<HomePage />} />
+        <Route element={<AppLayout />}>
+          <Route path="/" element={<HomePage />} />
+
+          <Route element={<RequirePermission permission="print_orders:read" />}>
+            <Route path="/printOrders" element={<PrintOrdersPage />} />
+          </Route>
+
+          <Route element={<RequirePermission permission="materials:read" />}>
+            <Route path="/materials" element={<MaterialsPage />} />
+          </Route>
+
+          <Route path="/forbidden" element={<ForbiddenPage />} />
+          <Route path="*" element={<NotFoundPage />} />
+        </Route>
       </Route>
     </Routes>
   );
