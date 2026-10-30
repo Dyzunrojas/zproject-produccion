@@ -2,7 +2,7 @@ from datetime import date, datetime
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from app.modules.spare_parts.schemas import SparePartUsageLine, SparePartUsageResponse
+from app.modules.sparePart.schemas import SparePartUsageLine, SparePartUsageResponse
 
 
 class DeviceData(BaseModel):
@@ -30,13 +30,12 @@ class DeviceResponse(BaseModel):
     serialNumber: str | None
 
 
-
 class RepairCreate(BaseModel):
     clientId: int
     device: DeviceData
     problemDescription: str = Field(min_length=1, max_length=255)
     estimatedDeliveryDate: date
-  
+
     allowDuplicate: bool = False
 
 
@@ -54,7 +53,7 @@ class RepairDiagnosis(BaseModel):
 
 
 class RepairStatusChange(BaseModel):
-    status: str = Field(pattern="^(received|diagnosed|inRepair|cancelled)$")
+    status: str = Field(pattern="^(recibido|diagnosticado|enReparacion|cancelado)$")
 
 
 class RepairFinalize(BaseModel):
@@ -82,4 +81,4 @@ class RepairResponse(BaseModel):
 
 class RepairFinalizeResponse(BaseModel):
     repair: RepairResponse
-    warning: str | None = None 
+    warning: str | None = None  
