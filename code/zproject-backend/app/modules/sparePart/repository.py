@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 
-from app.modules.spare_parts.models import SparePart, SparePartUsage
+from app.modules.sparePart.models import SparePart, SparePartUsage
 
 
 def getAll(db: Session) -> list[SparePart]:

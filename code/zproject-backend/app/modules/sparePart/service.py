@@ -1,10 +1,9 @@
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.modules.spare_parts import repository
-from app.modules.spare_parts.models import SparePart, SparePartUsage
-from app.modules.spare_parts.schemas import SparePartCreate, SparePartUpdate, SparePartUsageLine
-
+from app.modules.sparePart import repository
+from app.modules.sparePart.models import SparePart, SparePartUsage
+from app.modules.sparePart.schemas import SparePartCreate, SparePartUpdate, SparePartUsageLine
 
 def getSpareParts(db: Session) -> list[SparePart]:
     return repository.getAll(db)
