@@ -8,6 +8,7 @@ from app.core.database import Base, engine
 from app.modules.auth.router import router as authRouter
 from app.modules.client.router import router as clientRouter
 from app.modules.material.router import router as materialRouter
+from app.modules.payment.router import router as paymentRouter
 from app.modules.printOrder.router import router as printOrderRouter
 from app.modules.repairs.router import router as repairsRouter
 from app.modules.sparePart.router import router as sparePartRouter
@@ -30,6 +31,7 @@ app.add_middleware(
 app.include_router(authRouter)
 app.include_router(clientRouter)
 app.include_router(materialRouter)
+app.include_router(paymentRouter)
 app.include_router(printOrderRouter)
 app.include_router(warrantyRouter)
 app.include_router(toolRouter)
