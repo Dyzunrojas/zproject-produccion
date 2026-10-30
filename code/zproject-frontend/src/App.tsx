@@ -8,6 +8,8 @@ import { NotFoundPage } from "./pages/NotFoundPage";
 import { PrintOrdersPage } from "./pages/PrintOrdersPage";
 import { ProtectedRoute } from "./routes/ProtectedRoute";
 import { RequirePermission } from "./routes/RequirePermission";
+import { ToolsPage } from "./pages/ToolsPage";
+import { WarrantiesPage } from "./pages/WarrantiesPage";
 
 function App() {
   return (
@@ -24,6 +26,14 @@ function App() {
 
           <Route element={<RequirePermission permission="materials:read" />}>
             <Route path="/materials" element={<MaterialsPage />} />
+          </Route>
+
+          <Route element={<RequirePermission permission="tools:read" />}>
+            <Route path="/tools" element={<ToolsPage />} />
+          </Route>
+
+          <Route element={<RequirePermission permission="warranties:read" />}>
+            <Route path="/warranties" element={<WarrantiesPage />} />
           </Route>
 
           <Route path="/forbidden" element={<ForbiddenPage />} />
