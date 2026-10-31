@@ -6,8 +6,13 @@ export interface NavItem {
 
 export const navItems: NavItem[] = [
   { label: "Inicio", path: "/" },
-  { label: "Pedidos 3D", path: "/printOrders", permission: "print_orders:read" },
+  {
+    label: "Pedidos 3D",
+    path: "/printOrders",
+    permission: "print_orders:read",
+  },
   { label: "Materiales", path: "/materials", permission: "materials:read" },
   { label: "Herramientas", path: "/tools", permission: "tools:read" },
   { label: "Garantías", path: "/warranties", permission: "warranties:read" },
+  { label: "Repuestos", path: "/spareParts", permission: "spare_parts:read" },
 ];

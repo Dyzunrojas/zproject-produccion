@@ -10,6 +10,7 @@ import { ProtectedRoute } from "./routes/ProtectedRoute";
 import { RequirePermission } from "./routes/RequirePermission";
 import { ToolsPage } from "./pages/ToolsPage";
 import { WarrantiesPage } from "./pages/WarrantiesPage";
+import { SparePartsPage } from "./pages/SparePartsPage";
 
 function App() {
   return (
@@ -34,6 +35,10 @@ function App() {
 
           <Route element={<RequirePermission permission="warranties:read" />}>
             <Route path="/warranties" element={<WarrantiesPage />} />
+          </Route>
+
+          <Route element={<RequirePermission permission="spare_parts:read" />}>
+            <Route path="/spareParts" element={<SparePartsPage />} />
           </Route>
 
           <Route path="/forbidden" element={<ForbiddenPage />} />
