@@ -45,7 +45,9 @@ def createWarranty(db: Session, data: WarrantyCreate, force: bool = False) -> Wa
     return repository.create(db, warranty)
 
 
-def updateWarranty(db: Session, warrantyId: int, data: WarrantyUpdate) -> Warranty:
+def updateWarranty(
+    db: Session, warrantyId: int, data: WarrantyUpdate, force: bool = False
+) -> Warranty:
     warranty = getWarranty(db, warrantyId)
 
     changes = data.model_dump(exclude_unset=True)
@@ -57,10 +59,10 @@ def updateWarranty(db: Session, warrantyId: int, data: WarrantyUpdate) -> Warran
     if repairOrderId is not None and repairOrderId != warranty.repairOrderId:
         checkRepairExists(db, repairOrderId)
         active = repository.findActiveByRepairOrder(db, repairOrderId, date.today())
-        if active is not None and active.id != warranty.id:
+        if active is not None and active.id != warranty.id and not force:
             raise HTTPException(
                 status.HTTP_409_CONFLICT,
-                "La reparación ya tiene una garantía vigente",
+                "La reparación ya tiene una garantía vigente; confirme para mover la garantía",
             )
 
     for field, value in changes.items():

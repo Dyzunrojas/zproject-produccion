@@ -53,9 +53,12 @@ def createWarranty(
     dependencies=[Depends(requirePermission("warranties:update"))],
 )
 def updateWarranty(
-    warrantyId: int, data: WarrantyUpdate, db: Session = Depends(getDb)
+    warrantyId: int,
+    data: WarrantyUpdate,
+    force: bool = Query(default=False),
+    db: Session = Depends(getDb),
 ):
-    return service.updateWarranty(db, warrantyId, data)
+    return service.updateWarranty(db, warrantyId, data, force)
 
 
 @router.delete(
