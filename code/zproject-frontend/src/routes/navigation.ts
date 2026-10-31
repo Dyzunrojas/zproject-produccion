@@ -15,4 +15,5 @@ export const navItems: NavItem[] = [
   { label: "Herramientas", path: "/tools", permission: "tools:read" },
   { label: "Garantías", path: "/warranties", permission: "warranties:read" },
   { label: "Repuestos", path: "/spareParts", permission: "spare_parts:read" },
+  { label: "Reparaciones", path: "/repairs", permission: "repairs:read" },
 ];
