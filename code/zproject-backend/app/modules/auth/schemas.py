@@ -37,6 +37,10 @@ class RoleCreate(BaseModel):
     name: str = Field(min_length=1, max_length=50)
     permissionCodes: list[str] = Field(min_length=1)
 
+class RoleUpdate(BaseModel):
+    name: str = Field(min_length=1, max_length=50)
+    permissionCodes: list[str] = Field(min_length=1)
+
 
 class RoleResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)

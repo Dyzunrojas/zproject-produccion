@@ -39,7 +39,9 @@ def createPrintOrder(db: Session, data: PrintOrderCreate) -> PrintOrder:
     printOrder = PrintOrder(
         clientId=data.clientId,
         estimatedDeliveryDate=data.estimatedDeliveryDate,
-        objects=[Object3D(name=obj.name) for obj in data.objects],
+        objects=[
+            Object3D(name=obj.name, description=obj.description) for obj in data.objects
+        ],
     )
     return repository.create(db, printOrder)
 
@@ -69,7 +71,11 @@ def getObject(db: Session, printOrderId: int, objectId: int) -> Object3D:
 def addObject(db: Session, printOrderId: int, data: Object3DCreate) -> Object3D:
     printOrder = getPrintOrder(db, printOrderId)
     orderService.ensureEditable(printOrder)
-    obj = Object3D(printOrderId=printOrder.id, name=data.name)
+    obj = Object3D(
+        printOrderId=printOrder.id,
+        name=data.name,
+        description=data.description,
+    )
     return repository.createObject(db, obj)
 
 
@@ -118,8 +124,6 @@ def getStlPath(db: Session, printOrderId: int, objectId: int) -> tuple[Path, str
     return Path(obj.stlFilePath), f"{obj.name}.stl"
 
 
-# ---------- Finalizar pedido ----------
-
 def finalizePrintOrder(db: Session, printOrderId: int, data: PrintOrderFinalize) -> PrintOrder:
     printOrder = getPrintOrder(db, printOrderId)
     orderService.ensureEditable(printOrder)
@@ -152,4 +156,4 @@ def finalizePrintOrder(db: Session, printOrderId: int, data: PrintOrderFinalize)
 
     printOrder.status = OrderStatus.finished.value
     printOrder.deliveryDate = data.deliveryDate or date.today()
-    return repository.save(db, printOrder)  
+    return repository.save(db, printOrder)

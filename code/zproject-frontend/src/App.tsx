@@ -5,7 +5,10 @@ import { HomePage } from "./pages/HomePage";
 import { LoginPage } from "./pages/LoginPage";
 import { MaterialsPage } from "./pages/MaterialsPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
+import { PrintOrderDetailPage } from "./pages/PrintOrderDetailPage";
 import { PrintOrdersPage } from "./pages/PrintOrdersPage";
+import { RolesPage } from "./pages/RolesPage";
+import { UsersPage } from "./pages/UsersPage";
 import { ProtectedRoute } from "./routes/ProtectedRoute";
 import { RequirePermission } from "./routes/RequirePermission";
 
@@ -20,10 +23,19 @@ function App() {
 
           <Route element={<RequirePermission permission="print_orders:read" />}>
             <Route path="/printOrders" element={<PrintOrdersPage />} />
+            <Route path="/printOrders/:id" element={<PrintOrderDetailPage />} />
           </Route>
 
           <Route element={<RequirePermission permission="materials:read" />}>
             <Route path="/materials" element={<MaterialsPage />} />
+          </Route>
+
+          <Route element={<RequirePermission permission="auth:manageUsers" />}>
+            <Route path="/users" element={<UsersPage />} />
+          </Route>
+
+          <Route element={<RequirePermission permission="auth:manageRoles" />}>
+            <Route path="/roles" element={<RolesPage />} />
           </Route>
 
           <Route path="/forbidden" element={<ForbiddenPage />} />

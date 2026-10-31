@@ -1,4 +1,4 @@
-import { Button, Group } from "@mantine/core";
+import { Button } from "@mantine/core";
 import { PermissionGate } from "../components/atoms/PermissionGate";
 import { ConfirmModal } from "../components/molecules/ConfirmModal";
 import { PageHeader } from "../components/molecules/PageHeader";
@@ -11,6 +11,13 @@ import { useLoad } from "../hooks/useLoad";
 import { deleteMaterial, getMaterials } from "../services/materialService";
 import type { Material } from "../types/material";
 import { formatGrams } from "../utils/format";
+
+const columns: Column<Material>[] = [
+  { header: "Tipo", render: (material) => material.type },
+  { header: "Color", render: (material) => material.color },
+  { header: "Diámetro (mm)", render: (material) => material.diameter },
+  { header: "Stock (g)", render: (material) => formatGrams(material.stockGrams) },
+];
 
 export function MaterialsPage() {
   const { data: materials, loading, reload } = useLoad(getMaterials, [] as Material[]);
@@ -36,40 +43,6 @@ export function MaterialsPage() {
     }
   };
 
-  const columns: Column<Material>[] = [
-    { header: "Tipo", render: (material) => material.type },
-    { header: "Color", render: (material) => material.color },
-    { header: "Diámetro (mm)", render: (material) => material.diameter },
-    { header: "Stock (g)", render: (material) => formatGrams(material.stockGrams) },
-    {
-      header: "Acciones",
-      render: (material) => (
-        <Group gap="xs">
-          <PermissionGate permission="materials:purchase">
-            <Button size="xs" variant="light" onClick={() => purchaseModal.open(material)}>
-              Comprar
-            </Button>
-          </PermissionGate>
-          <PermissionGate permission="materials:update">
-            <Button size="xs" variant="default" onClick={() => formModal.open(material)}>
-              Editar
-            </Button>
-          </PermissionGate>
-          <PermissionGate permission="materials:delete">
-            <Button
-              size="xs"
-              variant="light"
-              color="red"
-              onClick={() => deleteModal.open(material)}
-            >
-              Eliminar
-            </Button>
-          </PermissionGate>
-        </Group>
-      ),
-    },
-  ];
-
   return (
     <>
       <PageHeader
@@ -87,6 +60,17 @@ export function MaterialsPage() {
         getRowKey={(material) => material.id}
         loading={loading}
         emptyMessage="No hay materiales registrados."
+        onEdit={(material) => formModal.open(material)}
+        onDelete={(material) => deleteModal.open(material)}
+        editPermission="materials:update"
+        deletePermission="materials:delete"
+        renderActions={(material) => (
+          <PermissionGate permission="materials:purchase">
+            <Button size="xs" variant="light" onClick={() => purchaseModal.open(material)}>
+              Comprar
+            </Button>
+          </PermissionGate>
+        )}
       />
 
       <MaterialFormModal

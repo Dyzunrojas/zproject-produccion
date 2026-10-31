@@ -1,8 +1,11 @@
 from decimal import Decimal
 from typing import TYPE_CHECKING
 
+
 from sqlalchemy import ForeignKey, Numeric, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import Text  # agrégalo al import de sqlalchemy que ya tienes
+
 
 from app.core.database import Base
 from app.modules.order.models import Order
@@ -32,6 +35,7 @@ class Object3D(Base):
     printOrderId: Mapped[int] = mapped_column(ForeignKey("print_order.id"))
     name: Mapped[str] = mapped_column(String(100))
     stlFilePath: Mapped[str | None] = mapped_column(String(255), default=None)  # se llena al subir el STL
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     printOrder: Mapped["PrintOrder"] = relationship(back_populates="objects")
 

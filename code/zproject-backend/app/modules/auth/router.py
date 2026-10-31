@@ -10,6 +10,7 @@ from app.modules.auth.schemas import (
     PermissionResponse,
     ResetPasswordRequest,
     RoleCreate,
+    RoleUpdate,
     RoleResponse,
     TokenResponse,
     UserCreate,
@@ -68,6 +69,15 @@ def listRoles(db: Session = Depends(getDb)):
 )
 def createRole(data: RoleCreate, db: Session = Depends(getDb)):
     return service.createRole(db, data)
+
+@router.put("/roles/{roleId}", response_model=RoleResponse)
+def updateRole(
+    roleId: int,
+    data: RoleUpdate,
+    admin: User = Depends(requirePermission("auth:manageRoles")),
+    db: Session = Depends(getDb),
+):
+    return service.updateRole(db, admin, roleId, data)
 
 
 # ---------- Usuarios ----------

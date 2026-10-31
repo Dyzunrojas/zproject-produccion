@@ -7,6 +7,7 @@ from app.modules.order.enums import OrderStatus
 
 class Object3DCreate(BaseModel):
     name: str = Field(min_length=1, max_length=100)
+    description: str | None = None   
 
 
 class Object3DResponse(BaseModel):
@@ -14,6 +15,7 @@ class Object3DResponse(BaseModel):
 
     id: int
     name: str
+    description: str | None = None   # <- nuevo
     stlFilePath: str | None
 
 

@@ -9,6 +9,7 @@ from app.modules.auth.schemas import (
     LoginRequest,
     ResetPasswordRequest,
     RoleCreate,
+    RoleUpdate,
     TokenResponse,
     UserCreate,
     UserResponse,
@@ -74,6 +75,33 @@ def createRole(db: Session, data: RoleCreate) -> Role:
     role = Role(name=data.name, permissions=permissions)
     return repository.createRole(db, role)
 
+def updateRole(db: Session, admin: User, roleId: int, data: RoleUpdate) -> Role:
+    role = repository.getRoleById(db, roleId)
+    if role is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Rol no encontrado")
+
+    existing = repository.getRoleByName(db, data.name)
+    if existing is not None and existing.id != role.id:
+        raise HTTPException(status.HTTP_409_CONFLICT, "Ya existe un rol con ese nombre")
+
+    codes = set(data.permissionCodes)
+    permissions = repository.getPermissionsByCodes(db, list(codes))
+    unknown = codes - {permission.code for permission in permissions}
+    if unknown:
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST, f"Permisos inexistentes: {', '.join(sorted(unknown))}"
+        )
+
+    # Evitar que el administrador se quite a sí mismo el acceso a la administración
+    if admin.roleId == role.id and not {"auth:manageUsers", "auth:manageRoles"} <= codes:
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST,
+            "No puedes quitarle a tu propio rol los permisos de administración",
+        )
+
+    role.name = data.name
+    role.permissions = permissions
+    return repository.saveRole(db, role)
 
 # ---------- Usuarios ----------
 

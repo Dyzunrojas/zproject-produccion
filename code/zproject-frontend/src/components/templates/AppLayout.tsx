@@ -3,11 +3,13 @@ import { useDisclosure } from "@mantine/hooks";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { navItems } from "../../routes/navigation";
+import { ChangePasswordModal } from "../organisms/ChangePasswordModal";
 
 export function AppLayout() {
   const { user, logout, hasPermission } = useAuth();
   const location = useLocation();
   const [opened, { toggle, close }] = useDisclosure();
+  const [passwordOpened, passwordHandlers] = useDisclosure(false);
 
   const visibleItems = navItems.filter(
     (item) => item.permission === undefined || hasPermission(item.permission),
@@ -29,6 +31,9 @@ export function AppLayout() {
             <Text size="sm">
               {user?.username} · {user?.role}
             </Text>
+            <Button variant="subtle" size="xs" onClick={passwordHandlers.open}>
+              Cambiar contraseña
+            </Button>
             <Button variant="light" size="xs" onClick={logout}>
               Cerrar sesión
             </Button>
@@ -52,6 +57,8 @@ export function AppLayout() {
       <AppShell.Main>
         <Outlet />
       </AppShell.Main>
+
+      <ChangePasswordModal opened={passwordOpened} onClose={passwordHandlers.close} />
     </AppShell>
   );
 }

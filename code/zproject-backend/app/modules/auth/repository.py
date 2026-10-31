@@ -53,3 +53,8 @@ def listPermissions(db: Session) -> list[Permission]:
 
 def getPermissionsByCodes(db: Session, codes: list[str]) -> list[Permission]:
     return db.query(Permission).filter(Permission.code.in_(codes)).all()
+
+def saveRole(db: Session, role: Role) -> Role:
+    db.commit()
+    db.refresh(role)
+    return role
