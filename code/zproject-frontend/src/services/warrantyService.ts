@@ -1,16 +1,10 @@
 import { api } from "../api/client";
 import type {
-  RepairOption,
   Warranty,
   WarrantyCreate,
   WarrantyUpdate,
   WarrantyFilters,
 } from "../types/warranty";
-
-export async function getRepairs(): Promise<RepairOption[]> {
-  const { data } = await api.get<RepairOption[]>("/repairs");
-  return data;
-}
 
 export async function getWarranties(filters: WarrantyFilters = {}): Promise<Warranty[]> {
   const { data } = await api.get<Warranty[]>("/warranties", { params: filters });

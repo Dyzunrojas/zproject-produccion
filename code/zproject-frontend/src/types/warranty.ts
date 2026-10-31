@@ -21,10 +21,3 @@ export interface WarrantyFilters {
   fromDate?: string;
   toDate?: string;
 }
-
-export interface RepairOption {
-  id: number;
-  status: string;
-  problemDescription: string;
-  device: { brand: string; model: string };
-}
