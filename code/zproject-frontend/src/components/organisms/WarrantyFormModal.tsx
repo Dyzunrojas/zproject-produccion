@@ -4,8 +4,10 @@ import axios from "axios";
 import { useState } from "react";
 import { useAsyncAction } from "../../hooks/useAsyncAction";
 import { useLoad } from "../../hooks/useLoad";
-import { createWarranty, getRepairs, updateWarranty } from "../../services/warrantyService";
-import type { RepairOption, Warranty, WarrantyCreate } from "../../types/warranty";
+import { getRepairs } from "../../services/repairService";
+import { createWarranty, updateWarranty } from "../../services/warrantyService";
+import type { Repair } from "../../types/repair";
+import type { Warranty, WarrantyCreate } from "../../types/warranty";
 import { notifyError, notifySuccess } from "../../utils/notify";
 import { FormActions } from "../molecules/FormActions";
 
@@ -27,7 +29,7 @@ function WarrantyForm({ warranty, onSaved, onCancel }: WarrantyFormProps) {
   const [duplicate, setDuplicate] = useState<WarrantyCreate | null>(null);
   const { data: repairs, loading: repairsLoading } = useLoad(
     getRepairs,
-    [] as RepairOption[],
+    [] as Repair[],
   );
 
   const repairOptions = repairs.map((repair) => ({

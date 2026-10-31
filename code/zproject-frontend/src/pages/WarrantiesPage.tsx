@@ -10,12 +10,10 @@ import { useAsyncAction } from "../hooks/useAsyncAction";
 import { useAuth } from "../hooks/useAuth";
 import { useItemModal } from "../hooks/useItemModal";
 import { useLoad } from "../hooks/useLoad";
-import {
-  deleteWarranty,
-  getRepairs,
-  getWarranties,
-} from "../services/warrantyService";
-import type { RepairOption, Warranty } from "../types/warranty";
+import { getRepairs } from "../services/repairService";
+import { deleteWarranty, getWarranties } from "../services/warrantyService";
+import type { Repair } from "../types/repair";
+import type { Warranty } from "../types/warranty";
 import { notifyError, notifySuccess } from "../utils/notify";
 
 function formatDate(value: string): string {
@@ -44,10 +42,10 @@ export function WarrantiesPage() {
   const { data: warranties, loading, reload } = useLoad(fetcher, [] as Warranty[]);
 
   const repairsFetcher = useCallback(
-    () => (canReadRepairs ? getRepairs() : Promise.resolve([] as RepairOption[])),
+    () => (canReadRepairs ? getRepairs() : Promise.resolve([] as Repair[])),
     [canReadRepairs],
   );
-  const { data: repairs } = useLoad(repairsFetcher, [] as RepairOption[]);
+  const { data: repairs } = useLoad(repairsFetcher, [] as Repair[]);
 
   const repairLabels = useMemo(() => {
     const map = new Map<number, string>();
