@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useAsyncAction } from "../../hooks/useAsyncAction";
 import { createTool, updateTool } from "../../services/toolService";
 import type { Tool, ToolCreate, ToolStatus } from "../../types/tool";
-import { notifySuccess } from "../../utils/notify";
+import { notifyError, notifySuccess } from "../../utils/notify";
 import { FormActions } from "../molecules/FormActions";
 
 const STATUS_OPTIONS: { value: ToolStatus; label: string }[] = [
@@ -64,7 +64,18 @@ function ToolForm({ tool, onSaved, onCancel }: ToolFormProps) {
     };
 
     if (tool) {
-      const ok = await run(() => updateTool(tool.id, payload), "Herramienta actualizada");
+      const ok = await run(async () => {
+        try {
+          await updateTool(tool.id, payload);
+          notifySuccess("Herramienta actualizada");
+        } catch (error) {
+          if (axios.isAxiosError(error) && error.response?.status === 404) {
+            notifyError(error);
+            return;
+          }
+          throw error;
+        }
+      });
       if (ok) {
         onSaved();
       }
