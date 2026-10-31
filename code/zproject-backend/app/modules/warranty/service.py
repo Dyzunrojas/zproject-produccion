@@ -3,6 +3,7 @@ from datetime import date
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
+from app.modules.repairs.models import RepairOrder
 from app.modules.warranty import repository
 from app.modules.warranty.models import Warranty
 from app.modules.warranty.schemas import WarrantyCreate, WarrantyUpdate
@@ -26,6 +27,7 @@ def getWarranty(db: Session, warrantyId: int) -> Warranty:
 
 def createWarranty(db: Session, data: WarrantyCreate, force: bool = False) -> Warranty:
     checkDates(data.startDate, data.expirationDate)
+    checkRepairExists(db, data.repairOrderId)
 
     active = repository.findActiveByRepairOrder(db, data.repairOrderId, date.today())
     if active is not None and not force:
@@ -53,6 +55,7 @@ def updateWarranty(db: Session, warrantyId: int, data: WarrantyUpdate) -> Warran
 
     repairOrderId = changes.get("repairOrderId")
     if repairOrderId is not None and repairOrderId != warranty.repairOrderId:
+        checkRepairExists(db, repairOrderId)
         active = repository.findActiveByRepairOrder(db, repairOrderId, date.today())
         if active is not None and active.id != warranty.id:
             raise HTTPException(
@@ -69,6 +72,11 @@ def deleteWarranty(db: Session, warrantyId: int) -> None:
     warranty = getWarranty(db, warrantyId)
     warranty.isActive = False
     repository.save(db, warranty)
+
+
+def checkRepairExists(db: Session, repairOrderId: int) -> None:
+    if db.get(RepairOrder, repairOrderId) is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Reparación no encontrada")
 
 
 def checkDates(startDate: date, expirationDate: date) -> None:
