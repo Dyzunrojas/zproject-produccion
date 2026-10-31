@@ -1,7 +1,8 @@
 from datetime import date, datetime
+from decimal import Decimal
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Date, DateTime, ForeignKey, String, func
+from sqlalchemy import Date, DateTime, ForeignKey, Numeric, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
@@ -21,6 +22,7 @@ class Order(Base):
     createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
     estimatedDeliveryDate: Mapped[date] = mapped_column(Date)
     deliveryDate: Mapped[date | None] = mapped_column(Date, default=None)
+    totalAmount: Mapped[Decimal | None] = mapped_column(Numeric(10, 2), default=None)
 
     client: Mapped["Client"] = relationship(back_populates="orders")
 

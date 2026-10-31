@@ -7,8 +7,12 @@ import { MaterialsPage } from "./pages/MaterialsPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
 import { PrintOrderDetailPage } from "./pages/PrintOrderDetailPage";
 import { PrintOrdersPage } from "./pages/PrintOrdersPage";
+import { RepairsPage } from "./pages/RepairsPage";
 import { RolesPage } from "./pages/RolesPage";
+import { SparePartsPage } from "./pages/SparePartsPage";
+import { ToolsPage } from "./pages/ToolsPage";
 import { UsersPage } from "./pages/UsersPage";
+import { WarrantiesPage } from "./pages/WarrantiesPage";
 import { ProtectedRoute } from "./routes/ProtectedRoute";
 import { RequirePermission } from "./routes/RequirePermission";
 
@@ -36,6 +40,22 @@ function App() {
 
           <Route element={<RequirePermission permission="auth:manageRoles" />}>
             <Route path="/roles" element={<RolesPage />} />
+          </Route>
+
+          <Route element={<RequirePermission permission="tools:read" />}>
+            <Route path="/tools" element={<ToolsPage />} />
+          </Route>
+
+          <Route element={<RequirePermission permission="warranties:read" />}>
+            <Route path="/warranties" element={<WarrantiesPage />} />
+          </Route>
+
+          <Route element={<RequirePermission permission="spare_parts:read" />}>
+            <Route path="/spareParts" element={<SparePartsPage />} />
+          </Route>
+
+          <Route element={<RequirePermission permission="repairs:read" />}>
+            <Route path="/repairs" element={<RepairsPage />} />
           </Route>
 
           <Route path="/forbidden" element={<ForbiddenPage />} />

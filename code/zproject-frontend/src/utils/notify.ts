@@ -6,5 +6,13 @@ export function notifySuccess(message: string): void {
 }
 
 export function notifyError(error: unknown): void {
-  notifications.show({ title: "Error", message: getErrorMessage(error), color: "red" });
+  notifications.show({
+    title: "Error",
+    message: getErrorMessage(error),
+    color: "red",
+  });
+}
+
+export function notifyWarning(message: string): void {
+  notifications.show({ message, color: "yellow" });
 }
