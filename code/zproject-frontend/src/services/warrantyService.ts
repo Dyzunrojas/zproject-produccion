@@ -24,8 +24,14 @@ export async function createWarranty(payload: WarrantyCreate, force = false): Pr
   return data;
 }
 
-export async function updateWarranty(id: number, payload: WarrantyUpdate): Promise<Warranty> {
-  const { data } = await api.put<Warranty>(`/warranties/${id}`, payload);
+export async function updateWarranty(
+  id: number,
+  payload: WarrantyUpdate,
+  force = false,
+): Promise<Warranty> {
+  const { data } = await api.put<Warranty>(`/warranties/${id}`, payload, {
+    params: force ? { force } : undefined,
+  });
   return data;
 }
 
