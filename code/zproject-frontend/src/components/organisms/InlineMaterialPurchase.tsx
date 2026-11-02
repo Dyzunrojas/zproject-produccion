@@ -45,7 +45,7 @@ export function InlineMaterialPurchase({ options, onPurchased }: InlineMaterialP
               placeholder="Material comprado"
               data={options}
               value={materialId}
-              onChange={setMaterialId}
+              onChange={(value) => setMaterialId(value === null ? null : String(value))}
             />
             <NumberInput
               placeholder="Gramos comprados"
@@ -53,7 +53,7 @@ export function InlineMaterialPurchase({ options, onPurchased }: InlineMaterialP
               decimalScale={2}
               hideControls
               value={grams}
-              onChange={setGrams}
+              onChange={(value) => setGrams(typeof value === "bigint" ? Number(value) : value)}
             />
             <Button
               w="fit-content"

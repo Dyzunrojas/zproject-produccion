@@ -3,3 +3,9 @@ __pycache__/
 *.pyc
 .env
 uploads/
+.coverage
+htmlcov/
+results.xml
+evidencia.html
+.pytest_cache/
+dist/
