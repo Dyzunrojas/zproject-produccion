@@ -3,6 +3,7 @@ from datetime import date
 import pytest
 from fastapi import HTTPException
 
+from app.modules.order import notifications
 from app.modules.order.enums import OrderStatus
 from app.modules.printOrder import service
 from app.modules.printOrder.schemas import (
@@ -22,7 +23,7 @@ def sentEmails(monkeypatch):
         sent.append({"to": to, "subject": subject, "body": body})
         return None
 
-    monkeypatch.setattr(service, "sendEmail", fake)
+    monkeypatch.setattr(notifications, "sendEmail", fake)
     return sent
 
 
@@ -144,7 +145,9 @@ def test_ped07_finalizarClienteSinCorreo(db, makeOrder, makeMaterial, sentEmails
 def test_ped08_fallaElCorreoNoDeshaceElPedido(db, makeOrder, makeMaterial, monkeypatch):
     """Finalizar cuando el servidor de correo falla.
     Esperado: el pedido queda finalizado y se devuelve el aviso del fallo."""
-    monkeypatch.setattr(service, "sendEmail", lambda to, subject, body: "No se pudo enviar el correo al cliente")
+    monkeypatch.setattr(
+        notifications, "sendEmail", lambda to, subject, body: "No se pudo enviar el correo al cliente"
+    )
     material = makeMaterial()
     order = makeOrder()
 

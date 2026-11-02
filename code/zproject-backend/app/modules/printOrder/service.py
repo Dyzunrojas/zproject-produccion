@@ -6,11 +6,11 @@ from fastapi import HTTPException, UploadFile, status
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
-from app.core.mailer import sendEmail
 from app.modules.client.models import Client
 from app.modules.material.models import Material
 from app.modules.order import service as orderService
 from app.modules.order.enums import OrderStatus
+from app.modules.order.notifications import notifyOrderFinished
 from app.modules.order.schemas import OrderStatusUpdate
 from app.modules.printOrder import repository
 from app.modules.printOrder.models import MaterialUsage, Object3D, PrintOrder
@@ -185,16 +185,10 @@ def finalizePrintOrder(
 
 def notifyClient(printOrder: PrintOrder) -> str | None:
     """Avisa al cliente que su pedido está listo. Devuelve un aviso si no se pudo."""
-    client = printOrder.client
-    if not client.email:
-        return "El cliente no tiene correo registrado"
-
     objects = ", ".join(obj.name for obj in printOrder.objects)
-    body = (
-        f"Hola {client.name},\n\n"
-        f"Tu pedido de impresión 3D ya está listo: {objects}.\n"
-        f"Número de pedido: #{printOrder.id}\n"
-        f"Fecha de entrega: {printOrder.deliveryDate:%d/%m/%Y}\n\n"
-        "¡Gracias por tu preferencia!"
+    return notifyOrderFinished(
+        printOrder,
+        kind="pedido",
+        subject=f"Tu pedido #{printOrder.id} está listo",
+        summary=f"Tu pedido de impresión 3D ya está listo: {objects}.",
     )
-    return sendEmail(client.email, f"Tu pedido #{printOrder.id} está listo", body)

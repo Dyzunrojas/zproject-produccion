@@ -4,10 +4,10 @@ from decimal import Decimal
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.core.mailer import sendEmail
 from app.modules.client.models import Client
 from app.modules.order import service as orderService
 from app.modules.order.enums import OrderStatus
+from app.modules.order.notifications import notifyOrderFinished
 from app.modules.order.schemas import OrderStatusUpdate
 from app.modules.repairs import repository
 from app.modules.repairs.models import Device, RepairOrder
@@ -210,23 +210,12 @@ def finalizeRepair(
 
 def notifyClient(repair: RepairOrder) -> str | None:
     """Avisa al cliente que su equipo está listo. Devuelve un aviso si no se pudo."""
-
-    client = repair.client
-
-    if not client.email:
-        return "El cliente no tiene correo registrado"
-
-    body = (
-        f"Hola {client.name},\n\n"
-        f"Tu equipo {repair.device.brand} {repair.device.model} "
-        f"(reparación #{repair.id}) "
-        "ya está listo para retirar.\n"
-        f"Fecha de entrega: {repair.deliveryDate:%d/%m/%Y}\n\n"
-        "¡Gracias por tu preferencia!"
-    )
-
-    return sendEmail(
-        client.email,
-        f"Tu reparación #{repair.id} está lista",
-        body
+    return notifyOrderFinished(
+        repair,
+        kind="reparación",
+        subject=f"Tu reparación #{repair.id} está lista",
+        summary=(
+            f"Tu equipo {repair.device.brand} {repair.device.model} "
+            "ya está listo para retirar."
+        ),
     )
