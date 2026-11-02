@@ -10,6 +10,7 @@ from app.modules.printOrder.schemas import (
     Object3DResponse,
     PrintOrderCreate,
     PrintOrderFinalize,
+    PrintOrderFinalizeResponse,
     PrintOrderResponse,
     PrintOrderUpdate,
 )
@@ -67,13 +68,14 @@ def changePrintOrderStatus(
 
 @router.post(
     "/{printOrderId}/finalize",
-    response_model=PrintOrderResponse,
+    response_model=PrintOrderFinalizeResponse,
     dependencies=[Depends(requirePermission("print_orders:finalize"))],
 )
 def finalizePrintOrder(
     printOrderId: int, data: PrintOrderFinalize, db: Session = Depends(getDb)
 ):
-    return service.finalizePrintOrder(db, printOrderId, data)
+    printOrder, warning = service.finalizePrintOrder(db, printOrderId, data)
+    return PrintOrderFinalizeResponse(printOrder=printOrder, warning=warning)
 
 
 # ---------- Objetos 3D ----------

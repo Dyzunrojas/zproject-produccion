@@ -37,9 +37,9 @@ export function LoginPage() {
   };
 
   return (
-    <Center h="100vh" bg="gray.0">
+    <Center h="100vh" bg="brand.9">
       <Paper w={380} p="xl" shadow="md" radius="md" withBorder>
-        <Title order={2} ta="center" mb="md">
+        <Title order={2} ta="center" mb="md" c="brand.9">
           ZProject
         </Title>
         <form onSubmit={form.onSubmit(handleSubmit)}>

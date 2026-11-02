@@ -6,6 +6,7 @@ from fastapi import HTTPException, UploadFile, status
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
+from app.core.mailer import sendEmail
 from app.modules.client.models import Client
 from app.modules.material.models import Material
 from app.modules.order import service as orderService
@@ -124,7 +125,11 @@ def getStlPath(db: Session, printOrderId: int, objectId: int) -> tuple[Path, str
     return Path(obj.stlFilePath), f"{obj.name}.stl"
 
 
-def finalizePrintOrder(db: Session, printOrderId: int, data: PrintOrderFinalize) -> PrintOrder:
+# ---------- Finalizar pedido ----------
+
+def finalizePrintOrder(
+    db: Session, printOrderId: int, data: PrintOrderFinalize
+) -> tuple[PrintOrder, str | None]:
     printOrder = getPrintOrder(db, printOrderId)
     orderService.ensureEditable(printOrder)
 
@@ -156,4 +161,24 @@ def finalizePrintOrder(db: Session, printOrderId: int, data: PrintOrderFinalize)
 
     printOrder.status = OrderStatus.finished.value
     printOrder.deliveryDate = data.deliveryDate or date.today()
-    return repository.save(db, printOrder)
+    repository.save(db, printOrder)
+
+    # El pedido ya quedó guardado: el correo nunca debe deshacerlo
+    return printOrder, notifyClient(printOrder)
+
+
+def notifyClient(printOrder: PrintOrder) -> str | None:
+    """Avisa al cliente que su pedido está listo. Devuelve un aviso si no se pudo."""
+    client = printOrder.client
+    if not client.email:
+        return "El cliente no tiene correo registrado"
+
+    objects = ", ".join(obj.name for obj in printOrder.objects)
+    body = (
+        f"Hola {client.name},\n\n"
+        f"Tu pedido de impresión 3D ya está listo: {objects}.\n"
+        f"Número de pedido: #{printOrder.id}\n"
+        f"Fecha de entrega: {printOrder.deliveryDate:%d/%m/%Y}\n\n"
+        "¡Gracias por tu preferencia!"
+    )
+    return sendEmail(client.email, f"Tu pedido #{printOrder.id} está listo", body)

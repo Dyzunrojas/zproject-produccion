@@ -26,6 +26,10 @@ class Order(Base):
 
     client: Mapped["Client"] = relationship(back_populates="orders")
 
+    @property
+    def clientName(self) -> str:
+        return self.client.name
+
     __mapper_args__ = {
         "polymorphic_on": "orderType",
         "polymorphic_identity": "order",

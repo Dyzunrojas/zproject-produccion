@@ -6,6 +6,7 @@ import type {
   PrintOrder,
   PrintOrderCreate,
   PrintOrderFinalize,
+  PrintOrderFinalizeResponse,
   PrintOrderUpdate,
 } from "../types/printOrder";
 
@@ -34,8 +35,14 @@ export async function changePrintOrderStatus(id: number, status: OrderStatus): P
   return data;
 }
 
-export async function finalizePrintOrder(id: number, payload: PrintOrderFinalize): Promise<PrintOrder> {
-  const { data } = await api.post<PrintOrder>(`/printOrders/${id}/finalize`, payload);
+export async function finalizePrintOrder(
+  id: number,
+  payload: PrintOrderFinalize,
+): Promise<PrintOrderFinalizeResponse> {
+  const { data } = await api.post<PrintOrderFinalizeResponse>(
+    `/printOrders/${id}/finalize`,
+    payload,
+  );
   return data;
 }
 

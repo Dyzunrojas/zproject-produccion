@@ -51,9 +51,15 @@ class PrintOrderResponse(BaseModel):
 
     id: int
     clientId: int
+    clientName: str
     status: OrderStatus
     createdAt: datetime
     estimatedDeliveryDate: date
     deliveryDate: date | None
     objects: list[Object3DResponse]
     materialUsages: list[MaterialUsageResponse]
+
+
+class PrintOrderFinalizeResponse(BaseModel):
+    printOrder: PrintOrderResponse
+    warning: str | None = None

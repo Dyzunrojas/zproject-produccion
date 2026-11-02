@@ -1,13 +1,16 @@
 import { Button, Group, Modal, NumberInput, Select, Stack, Text, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { randomId } from "@mantine/hooks";
+import { PermissionGate } from "../atoms/PermissionGate";
 import { useAsyncAction } from "../../hooks/useAsyncAction";
 import { useLoad } from "../../hooks/useLoad";
 import { getMaterials } from "../../services/materialService";
 import { finalizePrintOrder } from "../../services/printOrderService";
 import type { Material } from "../../types/material";
 import { formatGrams } from "../../utils/format";
+import { notifyWarning } from "../../utils/notify";
 import { FormActions } from "../molecules/FormActions";
+import { InlineMaterialPurchase } from "./InlineMaterialPurchase";
 
 interface FinalizeValues {
   deliveryDate: string;
@@ -24,7 +27,7 @@ interface FinalizeFormProps {
 
 function FinalizeForm({ orderId, onSaved, onCancel }: FinalizeFormProps) {
   const { busy, run } = useAsyncAction();
-  const { data: materials, loading } = useLoad(getMaterials, [] as Material[]);
+  const { data: materials, loading, reload } = useLoad(getMaterials, [] as Material[]);
 
   const form = useForm<FinalizeValues>({
     initialValues: {
@@ -61,18 +64,29 @@ function FinalizeForm({ orderId, onSaved, onCancel }: FinalizeFormProps) {
       label: `${material.type} ${material.color} (${formatGrams(Number(material.stockGrams))})`,
     }));
 
+  const handlePurchased = () => {
+    reload();
+    form.clearErrors();
+  };
+
   const handleSubmit = async (values: FinalizeValues) => {
-    const ok = await run(
-      () =>
-        finalizePrintOrder(orderId, {
-          deliveryDate: values.deliveryDate || undefined,
-          materialsUsed: values.materialsUsed.map((row) => ({
-            materialId: Number(row.materialId),
-            gramsUsed: Number(row.gramsUsed),
-          })),
-        }),
-      "Pedido finalizado",
-    );
+    let warning = null as string | null;
+
+    const ok = await run(async () => {
+      const result = await finalizePrintOrder(orderId, {
+        deliveryDate: values.deliveryDate || undefined,
+        materialsUsed: values.materialsUsed.map((row) => ({
+          materialId: Number(row.materialId),
+          gramsUsed: Number(row.gramsUsed),
+        })),
+      });
+      warning = result.warning;
+    }, "Pedido finalizado");
+
+    // El pedido ya está finalizado; el aviso solo informa si el correo no salió
+    if (warning) {
+      notifyWarning(warning);
+    }
     if (ok) {
       onSaved();
     }
@@ -121,6 +135,9 @@ function FinalizeForm({ orderId, onSaved, onCancel }: FinalizeFormProps) {
           <Button variant="light" onClick={() => form.insertListItem("materialsUsed", emptyRow())}>
             Agregar material
           </Button>
+          <PermissionGate permission="materials:purchase">
+            <InlineMaterialPurchase options={materialOptions} onPurchased={handlePurchased} />
+          </PermissionGate>
         </Stack>
 
         <Text size="xs" c="dimmed">

@@ -43,3 +43,8 @@ export interface PrintOrderFinalize {
   deliveryDate?: string;
   materialsUsed: { materialId: number; gramsUsed: number }[];
 }
+
+export interface PrintOrderFinalizeResponse {
+  printOrder: PrintOrder;
+  warning: string | null;
+}
