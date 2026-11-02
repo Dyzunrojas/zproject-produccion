@@ -25,6 +25,16 @@ class PrintOrder(Order):
     )
     materialUsages: Mapped[list["MaterialUsage"]] = relationship(back_populates="printOrder")
 
+    @property
+    def totalPaid(self) -> Decimal:
+        """Suma de los abonos que no están cancelados."""
+        return sum((p.amountPaid for p in self.payments if not p.isCancelled), Decimal("0"))
+
+    @property
+    def balance(self) -> Decimal:
+        """Saldo pendiente = monto total - abonado."""
+        return (self.totalAmount or Decimal("0")) - self.totalPaid
+
     __mapper_args__ = {"polymorphic_identity": "print"}
 
 

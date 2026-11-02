@@ -22,6 +22,10 @@ from app.modules.printOrder.schemas import (
 )
 
 
+def toDecimal(value: float | None) -> Decimal | None:
+    return None if value is None else Decimal(str(value))
+
+
 def getPrintOrders(db: Session) -> list[PrintOrder]:
     return repository.getAll(db)
 
@@ -40,6 +44,7 @@ def createPrintOrder(db: Session, data: PrintOrderCreate) -> PrintOrder:
     printOrder = PrintOrder(
         clientId=data.clientId,
         estimatedDeliveryDate=data.estimatedDeliveryDate,
+        totalAmount=toDecimal(data.totalAmount),
         objects=[
             Object3D(name=obj.name, description=obj.description) for obj in data.objects
         ],
@@ -50,8 +55,19 @@ def createPrintOrder(db: Session, data: PrintOrderCreate) -> PrintOrder:
 def updatePrintOrder(db: Session, printOrderId: int, data: PrintOrderUpdate) -> PrintOrder:
     printOrder = getPrintOrder(db, printOrderId)
     orderService.ensureEditable(printOrder)
-    for field, value in data.model_dump(exclude_unset=True).items():
-        setattr(printOrder, field, value)
+
+    changes = data.model_dump(exclude_unset=True)
+    if "totalAmount" in changes:
+        newTotal = toDecimal(changes["totalAmount"]) or Decimal("0")
+        if newTotal < printOrder.totalPaid:
+            raise HTTPException(
+                status.HTTP_400_BAD_REQUEST,
+                f"Ya hay {printOrder.totalPaid} abonados: el monto no puede ser menor. "
+                "Cancela un pago si necesitas bajarlo más",
+            )
+
+    for field, value in changes.items():
+        setattr(printOrder, field, toDecimal(value) if field == "totalAmount" else value)
     return repository.save(db, printOrder)
 
 

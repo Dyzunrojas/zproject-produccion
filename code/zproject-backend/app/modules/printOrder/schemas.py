@@ -34,11 +34,13 @@ class MaterialUsageResponse(BaseModel):
 class PrintOrderCreate(BaseModel):
     clientId: int
     estimatedDeliveryDate: date
+    totalAmount: float | None = Field(default=None, ge=0)
     objects: list[Object3DCreate] = Field(min_length=1)
 
 
 class PrintOrderUpdate(BaseModel):
     estimatedDeliveryDate: date | None = None
+    totalAmount: float | None = Field(default=None, ge=0)
 
 
 class PrintOrderFinalize(BaseModel):
@@ -56,6 +58,9 @@ class PrintOrderResponse(BaseModel):
     createdAt: datetime
     estimatedDeliveryDate: date
     deliveryDate: date | None
+    totalAmount: float | None = None
+    totalPaid: float = 0
+    balance: float = 0
     objects: list[Object3DResponse]
     materialUsages: list[MaterialUsageResponse]
 

@@ -8,6 +8,7 @@ import { ConfirmModal } from "../components/molecules/ConfirmModal";
 import { PageHeader } from "../components/molecules/PageHeader";
 import { DataTable, type Column } from "../components/organisms/DataTable";
 import { EditDeliveryDateModal } from "../components/organisms/EditDeliveryDateModal";
+import { EditTotalAmountModal } from "../components/organisms/EditTotalAmountModal";
 import { FinalizePrintOrderModal } from "../components/organisms/FinalizePrintOrderModal";
 import { ObjectFormModal } from "../components/organisms/ObjectFormModal";
 import { useAsyncAction } from "../hooks/useAsyncAction";
@@ -22,7 +23,7 @@ import {
 } from "../services/printOrderService";
 import type { Material } from "../types/material";
 import type { MaterialUsage, Object3D, PrintOrder } from "../types/printOrder";
-import { formatDate, formatGrams } from "../utils/format";
+import { formatDate, formatGrams, formatMoney } from "../utils/format";
 
 function Info({ label, children }: { label: string; children: ReactNode }) {
   return (
@@ -48,6 +49,7 @@ export function PrintOrderDetailPage() {
 
   const { busy, run } = useAsyncAction();
   const [dateOpened, dateHandlers] = useDisclosure(false);
+  const [amountOpened, amountHandlers] = useDisclosure(false);
   const [objectOpened, objectHandlers] = useDisclosure(false);
   const [finalizeOpened, finalizeHandlers] = useDisclosure(false);
   const deleteModal = useItemModal<Object3D>();
@@ -204,6 +206,33 @@ export function PrintOrderDetailPage() {
             </SimpleGrid>
           </Paper>
 
+          <Paper withBorder p="md">
+            <SimpleGrid cols={{ base: 1, sm: 3 }}>
+              <Info label="Monto total">
+                <Group gap="xs">
+                  {formatMoney(order.totalAmount)}
+                  {editable && (
+                    <PermissionGate permission="print_orders:update">
+                      <Button size="compact-xs" variant="subtle" onClick={amountHandlers.open}>
+                        Cambiar
+                      </Button>
+                    </PermissionGate>
+                  )}
+                </Group>
+              </Info>
+              <Info label="Abonado">{formatMoney(order.totalPaid)}</Info>
+              <Info label="Saldo pendiente">
+                <Text fw={700} size="lg" c={order.balance <= 0 && order.totalAmount ? "green.8" : undefined}>
+                  {order.totalAmount === null
+                    ? "Sin monto definido"
+                    : order.balance <= 0
+                      ? "Pagado"
+                      : formatMoney(order.balance)}
+                </Text>
+              </Info>
+            </SimpleGrid>
+          </Paper>
+
           <Group justify="space-between">
             <Title order={4}>Objetos</Title>
             {editable && (
@@ -247,6 +276,14 @@ export function PrintOrderDetailPage() {
             currentDate={order.estimatedDeliveryDate}
             onClose={dateHandlers.close}
             onSaved={closeAndReload(dateHandlers.close)}
+          />
+          <EditTotalAmountModal
+            opened={amountOpened}
+            orderId={orderId}
+            currentAmount={order.totalAmount}
+            totalPaid={order.totalPaid}
+            onClose={amountHandlers.close}
+            onSaved={closeAndReload(amountHandlers.close)}
           />
           <ObjectFormModal
             opened={objectOpened}

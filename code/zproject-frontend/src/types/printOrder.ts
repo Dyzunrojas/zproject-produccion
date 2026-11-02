@@ -25,6 +25,9 @@ export interface PrintOrder {
   status: OrderStatus;
   estimatedDeliveryDate: string;
   deliveryDate: string | null;
+  totalAmount: number | null;
+  totalPaid: number;
+  balance: number;
   objects: Object3D[];
   materialUsages: MaterialUsage[];
 }
@@ -32,11 +35,13 @@ export interface PrintOrder {
 export interface PrintOrderCreate {
   clientId: number;
   estimatedDeliveryDate: string;
+  totalAmount?: number;
   objects: Object3DCreate[];
 }
 
 export interface PrintOrderUpdate {
   estimatedDeliveryDate?: string;
+  totalAmount?: number;
 }
 
 export interface PrintOrderFinalize {

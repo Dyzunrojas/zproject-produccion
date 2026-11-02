@@ -9,6 +9,7 @@ from app.core.database import Base
 
 if TYPE_CHECKING:
     from app.modules.client.models import Client
+    from app.modules.payment.models import Payment
 
 
 class Order(Base):
@@ -25,6 +26,8 @@ class Order(Base):
     totalAmount: Mapped[Decimal | None] = mapped_column(Numeric(10, 2), default=None)
 
     client: Mapped["Client"] = relationship(back_populates="orders")
+    # Solo para leer los abonos del pedido (los pagos se crean desde el módulo de pagos)
+    payments: Mapped[list["Payment"]] = relationship(viewonly=True)
 
     @property
     def clientName(self) -> str:

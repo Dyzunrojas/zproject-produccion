@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, Group, SegmentedControl } from "@mantine/core";
+import { Badge, Button, Group, SegmentedControl, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { PermissionGate } from "../components/atoms/PermissionGate";
 import { StatusBadge } from "../components/atoms/StatusBadge";
@@ -13,7 +13,7 @@ import { useItemModal } from "../hooks/useItemModal";
 import { useLoad } from "../hooks/useLoad";
 import { changePrintOrderStatus, getPrintOrders } from "../services/printOrderService";
 import type { PrintOrder } from "../types/printOrder";
-import { formatDate } from "../utils/format";
+import { formatDate, formatMoney } from "../utils/format";
 import { orderStatusLabels } from "../utils/orderStatus";
 
 const filterOptions = [
@@ -68,6 +68,25 @@ export function PrintOrdersPage() {
     { header: "Estado", render: (order) => <StatusBadge status={order.status} /> },
     { header: "Entrega estimada", render: (order) => formatDate(order.estimatedDeliveryDate) },
     { header: "Entregado", render: (order) => formatDate(order.deliveryDate) },
+    {
+      header: "Saldo pendiente",
+      render: (order) => {
+        if (order.totalAmount === null) {
+          return (
+            <Text size="sm" c="dimmed">
+              Sin monto
+            </Text>
+          );
+        }
+        return order.balance <= 0 ? (
+          <Badge color="green">Pagado</Badge>
+        ) : (
+          <Text size="sm" fw={600}>
+            {formatMoney(order.balance)}
+          </Text>
+        );
+      },
+    },
     {
       header: "Acciones",
       render: (order) => (

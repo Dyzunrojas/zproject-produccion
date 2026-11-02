@@ -1,4 +1,14 @@
-import { Button, Group, Modal, Select, Stack, Text, Textarea, TextInput } from "@mantine/core";
+import {
+  Button,
+  Group,
+  Modal,
+  NumberInput,
+  Select,
+  Stack,
+  Text,
+  Textarea,
+  TextInput,
+} from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { randomId } from "@mantine/hooks";
 import { useAsyncAction } from "../../hooks/useAsyncAction";
@@ -11,6 +21,7 @@ import { FormActions } from "../molecules/FormActions";
 interface PrintOrderFormValues {
   clientId: string | null;
   estimatedDeliveryDate: string;
+  totalAmount: number | string;
   objects: { key: string; name: string; description: string }[];
 }
 
@@ -31,6 +42,7 @@ function PrintOrderForm({ onSaved, onCancel }: PrintOrderFormProps) {
     initialValues: {
       clientId: null,
       estimatedDeliveryDate: "",
+      totalAmount: "",
       objects: [emptyObject()],
     },
     validate: {
@@ -40,6 +52,8 @@ function PrintOrderForm({ onSaved, onCancel }: PrintOrderFormProps) {
         if (value < minDate) return "La fecha no puede ser anterior a hoy";
         return null;
       },
+      totalAmount: (value) =>
+        value !== "" && !(Number(value) >= 0) ? "Ingresa un monto válido" : null,
       objects: {
         name: (value) => (value.trim() ? null : "Ingresa el nombre del objeto"),
       },
@@ -56,6 +70,7 @@ function PrintOrderForm({ onSaved, onCancel }: PrintOrderFormProps) {
         createPrintOrder({
           clientId: Number(values.clientId),
           estimatedDeliveryDate: values.estimatedDeliveryDate,
+          totalAmount: values.totalAmount === "" ? undefined : Number(values.totalAmount),
           objects: values.objects.map((item) => ({
             name: item.name.trim(),
             description: item.description.trim() || undefined,
@@ -85,6 +100,14 @@ function PrintOrderForm({ onSaved, onCancel }: PrintOrderFormProps) {
           type="date"
           min={minDate}
           {...form.getInputProps("estimatedDeliveryDate")}
+        />
+        <NumberInput
+          label="Monto total (opcional, se puede definir después)"
+          prefix="₡ "
+          thousandSeparator=" "
+          decimalScale={2}
+          min={0}
+          {...form.getInputProps("totalAmount")}
         />
 
         <Stack gap="xs">
