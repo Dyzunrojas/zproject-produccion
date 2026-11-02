@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Badge, Button, Group, SegmentedControl, Text } from "@mantine/core";
+import { Badge, Button, Group, SegmentedControl, Select, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { PermissionGate } from "../components/atoms/PermissionGate";
 import { StatusBadge } from "../components/atoms/StatusBadge";
@@ -11,8 +11,11 @@ import { PrintOrderFormModal } from "../components/organisms/PrintOrderFormModal
 import { useAsyncAction } from "../hooks/useAsyncAction";
 import { useItemModal } from "../hooks/useItemModal";
 import { useLoad } from "../hooks/useLoad";
+import { getClients } from "../services/clientService";
 import { changePrintOrderStatus, getPrintOrders } from "../services/printOrderService";
+import type { Client } from "../types/client";
 import type { PrintOrder } from "../types/printOrder";
+import { buildClientOptions } from "../utils/clientOptions";
 import { formatDate, formatMoney } from "../utils/format";
 import { orderStatusLabels } from "../utils/orderStatus";
 
@@ -27,13 +30,18 @@ const filterOptions = [
 export function PrintOrdersPage() {
   const navigate = useNavigate();
   const { data: orders, loading, reload } = useLoad(getPrintOrders, [] as PrintOrder[]);
+  const { data: clients } = useLoad(getClients, [] as Client[]);
   const [statusFilter, setStatusFilter] = useState("all");
+  const [clientFilter, setClientFilter] = useState<string | null>(null);
   const [createOpened, createHandlers] = useDisclosure(false);
   const cancelModal = useItemModal<PrintOrder>();
   const { busy, run } = useAsyncAction();
 
-  const visibleOrders =
-    statusFilter === "all" ? orders : orders.filter((order) => order.status === statusFilter);
+  const visibleOrders = orders.filter(
+    (order) =>
+      (statusFilter === "all" || order.status === statusFilter) &&
+      (!clientFilter || order.clientId === Number(clientFilter)),
+  );
 
   const handleCreated = () => {
     createHandlers.close();
@@ -126,12 +134,22 @@ export function PrintOrdersPage() {
         }
       />
 
-      <SegmentedControl
-        mb="md"
-        value={statusFilter}
-        onChange={(value) => setStatusFilter(String(value))}
-        data={filterOptions}
-      />
+      <Group mb="md">
+        <SegmentedControl
+          value={statusFilter}
+          onChange={(value) => setStatusFilter(String(value))}
+          data={filterOptions}
+        />
+        <Select
+          placeholder="Todos los clientes"
+          clearable
+          searchable
+          nothingFoundMessage="No se encontraron clientes"
+          data={buildClientOptions(clients)}
+          value={clientFilter}
+          onChange={(value) => setClientFilter(value === null ? null : String(value))}
+        />
+      </Group>
 
       <DataTable
         rows={visibleOrders}

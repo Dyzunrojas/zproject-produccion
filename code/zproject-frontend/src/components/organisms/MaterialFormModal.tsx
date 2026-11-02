@@ -3,6 +3,7 @@ import { useForm } from "@mantine/form";
 import { useAsyncAction } from "../../hooks/useAsyncAction";
 import { createMaterial, updateMaterial } from "../../services/materialService";
 import type { Material } from "../../types/material";
+import { validateColor, validateMaterialType } from "../../utils/validators";
 import { FormActions } from "../molecules/FormActions";
 
 interface MaterialFormValues {
@@ -29,8 +30,8 @@ function MaterialForm({ material, onSaved, onCancel }: MaterialFormProps) {
       stockGrams: material?.stockGrams ?? 0,
     },
     validate: {
-      type: (value) => (value.trim() ? null : "Ingresa el tipo de material"),
-      color: (value) => (value.trim() ? null : "Ingresa el color"),
+      type: validateMaterialType,
+      color: validateColor,
       diameter: (value) => (Number(value) > 0 ? null : "Debe ser mayor a 0"),
       stockGrams: (value) =>
         value !== "" && Number(value) >= 0 ? null : "No puede ser negativo",
