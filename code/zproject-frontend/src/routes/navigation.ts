@@ -18,4 +18,6 @@ export const navItems: NavItem[] = [
   { label: "Garantías", path: "/warranties", permission: "warranties:read" },
   { label: "Repuestos", path: "/spareParts", permission: "spare_parts:read" },
   { label: "Reparaciones", path: "/repairs", permission: "repairs:read" },
+  { label: "Clientes", path: "/clients", permission: "clients:read" },
+  { label: "Pagos", path: "/payments", permission: "payments:read" },
 ];

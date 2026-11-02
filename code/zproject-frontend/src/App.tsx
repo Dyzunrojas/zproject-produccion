@@ -15,6 +15,8 @@ import { UsersPage } from "./pages/UsersPage";
 import { WarrantiesPage } from "./pages/WarrantiesPage";
 import { ProtectedRoute } from "./routes/ProtectedRoute";
 import { RequirePermission } from "./routes/RequirePermission";
+import { ClientsPage } from "./pages/ClientsPage";
+import { PaymentsPage } from "./pages/PaymentsPage";
 
 function App() {
   return (
@@ -60,6 +62,14 @@ function App() {
 
           <Route path="/forbidden" element={<ForbiddenPage />} />
           <Route path="*" element={<NotFoundPage />} />
+
+                    <Route element={<RequirePermission permission="clients:read" />}>
+            <Route path="/clients" element={<ClientsPage />} />
+          </Route>
+
+          <Route element={<RequirePermission permission="payments:read" />}>
+            <Route path="/payments" element={<PaymentsPage />} />
+          </Route>
         </Route>
       </Route>
     </Routes>
