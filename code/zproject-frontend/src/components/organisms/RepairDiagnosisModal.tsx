@@ -26,12 +26,14 @@ function RepairDiagnosisForm({
   const form = useForm<RepairDiagnosisValues>({
     initialValues: {
       diagnosis: repair.diagnosis ?? "",
-      diagnosisAmount: repair.diagnosisAmount ?? 0,
+      diagnosisAmount: repair.diagnosisAmount ?? "",
     },
     validate: {
       diagnosis: (value) => (value.trim() ? null : "Ingresa el diagnóstico"),
       diagnosisAmount: (value) =>
-        value !== "" && Number(value) >= 0 ? null : "No puede ser negativo",
+        value !== "" && Number(value) >= 0
+          ? null
+          : "Ingresa un monto válido (0 o más)",
     },
   });
 
@@ -44,6 +46,7 @@ function RepairDiagnosisForm({
         }),
       "Diagnóstico guardado",
     );
+
     if (ok) {
       onSaved();
     }
@@ -59,12 +62,14 @@ function RepairDiagnosisForm({
           maxLength={255}
           {...form.getInputProps("diagnosis")}
         />
+
         <NumberInput
           label="Monto del diagnóstico"
           decimalScale={2}
           min={0}
           {...form.getInputProps("diagnosisAmount")}
         />
+
         <FormActions submitting={busy} onCancel={onCancel} />
       </Stack>
     </form>

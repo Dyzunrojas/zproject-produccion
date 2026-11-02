@@ -1,3 +1,4 @@
+import type { OrderStatus } from "./order";
 import type { SparePart } from "./sparePart";
 
 export interface Device {
@@ -26,7 +27,8 @@ export interface SparePartUsage {
 export interface Repair {
   id: number;
   clientId: number;
-  status: string;
+  clientName: string;
+  status: OrderStatus;
   createdAt: string;
   estimatedDeliveryDate: string;
   deliveryDate: string | null;
@@ -61,16 +63,13 @@ export interface RepairDiagnosis {
   diagnosisAmount: number;
 }
 
-export interface RepairStatusChange {
-  status: string;
-}
-
 export interface RepairSparePartLine {
   sparePartId: number;
   quantityUsed: number;
 }
 
 export interface RepairFinalize {
+  deliveryDate?: string;
   spareParts: RepairSparePartLine[];
 }
 
@@ -78,6 +77,3 @@ export interface RepairFinalizeResult {
   repair: Repair;
   warning: string | null;
 }
-
-
-

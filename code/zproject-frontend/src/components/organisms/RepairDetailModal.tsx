@@ -1,11 +1,8 @@
 import type { ReactNode } from "react";
-import { Badge, Group, Modal, Stack, Text } from "@mantine/core";
+import { Group, Modal, Stack, Text } from "@mantine/core";
+import { StatusBadge } from "../atoms/StatusBadge";
 import type { Repair } from "../../types/repair";
 import { formatDate, formatMoney } from "../../utils/format";
-import {
-  getRepairStatusColor,
-  getRepairStatusLabel,
-} from "../../utils/repairStatus";
 
 function DetailRow({
   label,
@@ -27,31 +24,27 @@ function DetailRow({
 interface RepairDetailModalProps {
   opened: boolean;
   repair: Repair | null;
-  clientName: string;
   onClose: () => void;
 }
 
 export function RepairDetailModal({
   opened,
   repair,
-  clientName,
   onClose,
 }: RepairDetailModalProps) {
   return (
     <Modal
       opened={opened}
       onClose={onClose}
-      title={repair ? `Reparación #${repair.id}` : "Reparación"}
+      title="Detalle de la reparación"
       centered
     >
       {repair && (
         <Stack gap="sm">
           <Group>
-            <Badge color={getRepairStatusColor(repair.status)}>
-              {getRepairStatusLabel(repair.status)}
-            </Badge>
+            <StatusBadge status={repair.status} />
           </Group>
-          <DetailRow label="Cliente">{clientName}</DetailRow>
+          <DetailRow label="Cliente">{repair.clientName}</DetailRow>
           <DetailRow label="Equipo">
             {repair.device.type} {repair.device.brand} {repair.device.model}
             {repair.device.serialNumber
@@ -70,6 +63,9 @@ export function RepairDetailModal({
           <DetailRow label="Ingreso">{formatDate(repair.createdAt)}</DetailRow>
           <DetailRow label="Entrega estimada">
             {formatDate(repair.estimatedDeliveryDate)}
+          </DetailRow>
+          <DetailRow label="Entregado">
+            {formatDate(repair.deliveryDate)}
           </DetailRow>
           <DetailRow label="Finalización">
             {formatDate(repair.finishedAt)}

@@ -5,13 +5,14 @@ from app.modules.sparePart import repository
 from app.modules.sparePart.models import SparePart, SparePartUsage
 from app.modules.sparePart.schemas import SparePartCreate, SparePartUpdate, SparePartUsageLine
 
+
 def getSpareParts(db: Session) -> list[SparePart]:
     return repository.getAll(db)
 
 
 def getSparePart(db: Session, sparePartId: int) -> SparePart:
     sparePart = repository.getById(db, sparePartId)
-   
+    # Un repuesto desactivado se trata como si no existiera
     if sparePart is None or not sparePart.isActive:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Repuesto no encontrado")
     return sparePart
@@ -31,7 +32,7 @@ def updateSparePart(db: Session, sparePartId: int, data: SparePartUpdate) -> Spa
 
 def deleteSparePart(db: Session, sparePartId: int) -> None:
     sparePart = getSparePart(db, sparePartId)
-    sparePart.isActive = False  
+    sparePart.isActive = False  # borrado lógico: la fila queda en la BD
     repository.save(db, sparePart)
 
 
@@ -46,8 +47,8 @@ def consumeSpareParts(db: Session, repairOrderId: int, lines: list[SparePartUsag
             raise HTTPException(status.HTTP_404_NOT_FOUND, "Repuesto no encontrado")
         if quantity > sparePart.stockUnits:
             raise HTTPException(
-                status.HTTP_409_CONFLICT,
-                f"Stock insuficiente de {sparePart.name}: disponibles {sparePart.stockUnits}",
+                status.HTTP_400_BAD_REQUEST,
+                f"Stock insuficiente de {sparePart.name} (hay {sparePart.stockUnits} unidades)",
             )
         sparePart.stockUnits -= quantity
         repository.addUsage(db, SparePartUsage(

@@ -4,7 +4,8 @@ from sqlalchemy.orm import Session
 from app.core.dependencies import getDb, requirePermission
 from app.modules.sparePart import service
 from app.modules.sparePart.schemas import SparePartCreate, SparePartResponse, SparePartUpdate
-router = APIRouter(prefix="/spare-parts", tags=["spare-parts"])
+
+router = APIRouter(prefix="/spareParts", tags=["spareParts"])
 
 
 @router.get(

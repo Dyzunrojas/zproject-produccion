@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
 from app.core.dependencies import getDb, requirePermission
+from app.modules.order.schemas import OrderStatusUpdate
 from app.modules.repairs import service
 from app.modules.repairs.schemas import (
     RepairCreate,
@@ -9,12 +10,10 @@ from app.modules.repairs.schemas import (
     RepairFinalize,
     RepairFinalizeResponse,
     RepairResponse,
-    RepairStatusChange,
     RepairUpdate,
 )
 
 router = APIRouter(prefix="/repairs", tags=["repairs"])
-
 
 
 @router.get(
@@ -35,7 +34,6 @@ def getRepair(repairId: int, db: Session = Depends(getDb)):
     return service.getRepair(db, repairId)
 
 
-
 @router.post(
     "",
     response_model=RepairResponse,
@@ -44,7 +42,6 @@ def getRepair(repairId: int, db: Session = Depends(getDb)):
 )
 def createRepair(data: RepairCreate, db: Session = Depends(getDb)):
     return service.createRepair(db, data)
-
 
 
 @router.put(
@@ -56,7 +53,6 @@ def updateRepair(repairId: int, data: RepairUpdate, db: Session = Depends(getDb)
     return service.updateRepair(db, repairId, data)
 
 
-
 @router.post(
     "/{repairId}/diagnosis",
     response_model=RepairResponse,
@@ -66,15 +62,13 @@ def registerDiagnosis(repairId: int, data: RepairDiagnosis, db: Session = Depend
     return service.registerDiagnosis(db, repairId, data)
 
 
-
 @router.patch(
     "/{repairId}/status",
     response_model=RepairResponse,
     dependencies=[Depends(requirePermission("repairs:update"))],
 )
-def changeStatus(repairId: int, data: RepairStatusChange, db: Session = Depends(getDb)):
+def changeStatus(repairId: int, data: OrderStatusUpdate, db: Session = Depends(getDb)):
     return service.changeStatus(db, repairId, data)
-
 
 
 @router.post(

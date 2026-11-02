@@ -1,4 +1,4 @@
-from sqlalchemy import ForeignKey, String
+from sqlalchemy import ForeignKey, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
@@ -18,6 +18,7 @@ class SparePart(Base):
 
 class SparePartUsage(Base):
     __tablename__ = "spare_part_usage"
+    __table_args__ = (UniqueConstraint("repairOrderId", "sparePartId"),)
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     repairOrderId: Mapped[int] = mapped_column(ForeignKey("repair_order.id"))

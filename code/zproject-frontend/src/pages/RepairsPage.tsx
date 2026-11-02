@@ -1,27 +1,32 @@
 import { useState } from "react";
-import { Badge, Button, Group, Select } from "@mantine/core";
+import { Button, Group, SegmentedControl, Select } from "@mantine/core";
 import { PermissionGate } from "../components/atoms/PermissionGate";
+import { StatusBadge } from "../components/atoms/StatusBadge";
+import { ConfirmModal } from "../components/molecules/ConfirmModal";
 import { PageHeader } from "../components/molecules/PageHeader";
 import { DataTable, type Column } from "../components/organisms/DataTable";
 import { RepairDetailModal } from "../components/organisms/RepairDetailModal";
 import { RepairDiagnosisModal } from "../components/organisms/RepairDiagnosisModal";
 import { RepairFinalizeModal } from "../components/organisms/RepairFinalizeModal";
 import { RepairFormModal } from "../components/organisms/RepairFormModal";
-import { RepairStatusModal } from "../components/organisms/RepairStatusModal";
+import { useAsyncAction } from "../hooks/useAsyncAction";
 import { useItemModal } from "../hooks/useItemModal";
 import { useLoad } from "../hooks/useLoad";
 import { getClients } from "../services/clientService";
-import { getRepairs } from "../services/repairService";
+import { changeRepairStatus, getRepairs } from "../services/repairService";
 import type { Client } from "../types/client";
 import type { Repair } from "../types/repair";
 import { buildClientOptions } from "../utils/clientOptions";
 import { formatDate } from "../utils/format";
-import {
-  filterStatusOptions,
-  getRepairStatusColor,
-  getRepairStatusLabel,
-  isRepairClosed,
-} from "../utils/repairStatus";
+import { orderStatusLabels } from "../utils/orderStatus";
+
+const filterOptions = [
+  { label: "Todos", value: "all" },
+  { label: orderStatusLabels.pending, value: "pending" },
+  { label: orderStatusLabels.inProgress, value: "inProgress" },
+  { label: orderStatusLabels.finished, value: "finished" },
+  { label: orderStatusLabels.cancelled, value: "cancelled" },
+];
 
 export function RepairsPage() {
   const {
@@ -31,36 +36,56 @@ export function RepairsPage() {
   } = useLoad(getRepairs, [] as Repair[]);
   const { data: clients } = useLoad(getClients, [] as Client[]);
 
-  const [statusFilter, setStatusFilter] = useState<string | null>(null);
+  const [statusFilter, setStatusFilter] = useState("all");
   const [clientFilter, setClientFilter] = useState<string | null>(null);
 
   const formModal = useItemModal<Repair>();
   const detailModal = useItemModal<Repair>();
   const diagnosisModal = useItemModal<Repair>();
-  const statusModal = useItemModal<Repair>();
   const finalizeModal = useItemModal<Repair>();
-
-  const clientName = (clientId: number) =>
-    clients.find((client) => client.id === clientId)?.name ??
-    `Cliente #${clientId}`;
+  const cancelModal = useItemModal<Repair>();
+  const { busy, run } = useAsyncAction();
 
   const handleSaved = () => {
     formModal.close();
     diagnosisModal.close();
-    statusModal.close();
     finalizeModal.close();
     reload();
   };
 
+  const handleStart = async (repair: Repair) => {
+    const ok = await run(
+      () => changeRepairStatus(repair.id, "inProgress"),
+      `Reparación #${repair.id} en proceso`,
+    );
+
+    if (ok) reload();
+  };
+
+  const handleCancel = async () => {
+    const target = cancelModal.item;
+    if (!target) return;
+
+    const ok = await run(
+      () => changeRepairStatus(target.id, "cancelled"),
+      `Reparación #${target.id} cancelada`,
+    );
+
+    if (ok) {
+      cancelModal.close();
+      reload();
+    }
+  };
+
   const visibleRepairs = repairs.filter(
     (repair) =>
-      (!statusFilter || repair.status === statusFilter) &&
+      (statusFilter === "all" || repair.status === statusFilter) &&
       (!clientFilter || repair.clientId === Number(clientFilter)),
   );
 
   const columns: Column<Repair>[] = [
-    { header: "N.º", render: (repair) => repair.id },
-    { header: "Cliente", render: (repair) => clientName(repair.clientId) },
+    { header: "#", render: (repair) => repair.id },
+    { header: "Cliente", render: (repair) => repair.clientName },
     {
       header: "Equipo",
       render: (repair) =>
@@ -68,11 +93,7 @@ export function RepairsPage() {
     },
     {
       header: "Estado",
-      render: (repair) => (
-        <Badge color={getRepairStatusColor(repair.status)}>
-          {getRepairStatusLabel(repair.status)}
-        </Badge>
-      ),
+      render: (repair) => <StatusBadge status={repair.status} />,
     },
     { header: "Ingreso", render: (repair) => formatDate(repair.createdAt) },
     {
@@ -80,56 +101,93 @@ export function RepairsPage() {
       render: (repair) => formatDate(repair.estimatedDeliveryDate),
     },
     {
+      header: "Entregado",
+      render: (repair) => formatDate(repair.deliveryDate),
+    },
+    {
       header: "Acciones",
-      render: (repair) => (
-        <Group gap="xs">
-          <Button
-            size="xs"
-            variant="default"
-            onClick={() => detailModal.open(repair)}
-          >
-            Detalle
-          </Button>
-          {!isRepairClosed(repair.status) && (
-            <>
-              <PermissionGate permission="repairs:update">
-                <Button
-                  size="xs"
-                  variant="default"
-                  onClick={() => formModal.open(repair)}
-                >
-                  Editar
-                </Button>
-                <Button
-                  size="xs"
-                  variant="light"
-                  onClick={() => diagnosisModal.open(repair)}
-                >
-                  Diagnóstico
-                </Button>
-                <Button
-                  size="xs"
-                  variant="light"
-                  onClick={() => statusModal.open(repair)}
-                >
-                  Estado
-                </Button>
-              </PermissionGate>
-              <PermissionGate permission="repairs:finalize">
-                <Button
-                  size="xs"
-                  variant="light"
-                  color="green"
-                  disabled={!repair.diagnosis}
-                  onClick={() => finalizeModal.open(repair)}
-                >
-                  Finalizar
-                </Button>
-              </PermissionGate>
-            </>
-          )}
-        </Group>
-      ),
+      render: (repair) => {
+        const open =
+          repair.status === "pending" || repair.status === "inProgress";
+
+        return (
+          <Group gap="xs" wrap="nowrap">
+            <Button
+              size="xs"
+              variant="default"
+              onClick={() => detailModal.open(repair)}
+            >
+              Detalle
+            </Button>
+
+            {open && (
+              <>
+                <PermissionGate permission="repairs:update">
+                  <Button
+                    size="xs"
+                    variant="default"
+                    onClick={() => formModal.open(repair)}
+                  >
+                    {repair.status === "inProgress"
+                      ? repair.workDescription && repair.workAmount !== null
+                        ? "Editar trabajo"
+                        : "Registrar trabajo"
+                      : "Editar registro"}
+                  </Button>
+
+                  {repair.status === "pending" && (
+                    <>
+                      <Button
+                        size="xs"
+                        variant="light"
+                        onClick={() => diagnosisModal.open(repair)}
+                      >
+                        Diagnóstico
+                      </Button>
+
+                      <Button
+                        size="xs"
+                        variant="light"
+                        disabled={!repair.diagnosis}
+                        onClick={() => handleStart(repair)}
+                      >
+                        Iniciar reparación
+                      </Button>
+                    </>
+                  )}
+
+                  <Button
+                    size="xs"
+                    variant="light"
+                    color="red"
+                    onClick={() => cancelModal.open(repair)}
+                  >
+                    Cancelar
+                  </Button>
+                </PermissionGate>
+
+                <PermissionGate permission="repairs:finalize">
+                  {repair.status === "inProgress" && (
+                    <Button
+                      size="xs"
+                      variant="light"
+                      color="green"
+                      disabled={
+                        !repair.diagnosis ||
+                        !repair.workDescription?.trim() ||
+                        repair.workAmount === null
+                      }
+                      onClick={() => finalizeModal.open(repair)}
+                    >
+                      Finalizar
+                    </Button>
+                  )}
+                </PermissionGate>
+              </>
+            )}
+          </Group>
+        );
+      },
     },
   ];
 
@@ -145,15 +203,12 @@ export function RepairsPage() {
       />
 
       <Group mb="md">
-        <Select
-          placeholder="Todos los estados"
-          clearable
-          data={filterStatusOptions}
+        <SegmentedControl
           value={statusFilter}
-          onChange={(value) =>
-            setStatusFilter(value === null ? null : String(value))
-          }
+          onChange={(value) => setStatusFilter(String(value))}
+          data={filterOptions}
         />
+
         <Select
           placeholder="Todos los clientes"
           clearable
@@ -172,8 +227,8 @@ export function RepairsPage() {
         columns={columns}
         getRowKey={(repair) => repair.id}
         loading={loading}
-        emptyMessage="No hay reparaciones registradas."
-        minWidth={900}
+        emptyMessage="No hay reparaciones para mostrar."
+        minWidth={1000}
       />
 
       <RepairFormModal
@@ -187,9 +242,6 @@ export function RepairsPage() {
       <RepairDetailModal
         opened={detailModal.opened}
         repair={detailModal.item}
-        clientName={
-          detailModal.item ? clientName(detailModal.item.clientId) : ""
-        }
         onClose={detailModal.close}
       />
 
@@ -200,18 +252,25 @@ export function RepairsPage() {
         onSaved={handleSaved}
       />
 
-      <RepairStatusModal
-        opened={statusModal.opened}
-        repair={statusModal.item}
-        onClose={statusModal.close}
-        onSaved={handleSaved}
-      />
-
       <RepairFinalizeModal
         opened={finalizeModal.opened}
         repair={finalizeModal.item}
         onClose={finalizeModal.close}
         onSaved={handleSaved}
+      />
+
+      <ConfirmModal
+        opened={cancelModal.opened}
+        title="Cancelar reparación"
+        message={
+          cancelModal.item
+            ? `¿Cancelar la reparación #${cancelModal.item.id} de ${cancelModal.item.clientName}? No se podrá modificar después.`
+            : ""
+        }
+        confirmLabel="Cancelar reparación"
+        loading={busy}
+        onConfirm={handleCancel}
+        onCancel={cancelModal.close}
       />
     </>
   );

@@ -1,11 +1,11 @@
 import { api } from "../api/client";
+import type { OrderStatus } from "../types/order";
 import type {
   Repair,
   RepairCreate,
   RepairDiagnosis,
   RepairFinalize,
   RepairFinalizeResult,
-  RepairStatusChange,
   RepairUpdate,
 } from "../types/repair";
 
@@ -37,9 +37,9 @@ export async function registerDiagnosis(
 
 export async function changeRepairStatus(
   id: number,
-  payload: RepairStatusChange,
+  status: OrderStatus,
 ): Promise<Repair> {
-  const { data } = await api.patch<Repair>(`/repairs/${id}/status`, payload);
+  const { data } = await api.patch<Repair>(`/repairs/${id}/status`, { status });
   return data;
 }
 

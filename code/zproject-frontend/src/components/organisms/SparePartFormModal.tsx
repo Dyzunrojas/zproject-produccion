@@ -68,18 +68,19 @@ function SparePartForm({ sparePart, onSaved, onCancel }: SparePartFormProps) {
       <Stack>
         <TextInput
           label="Nombre"
-          placeholder="Pantalla"
+          placeholder="Tornillo, pieza de repuesto..."
           maxLength={100}
           {...form.getInputProps("name")}
         />
         <TextInput
           label="Marca"
-          placeholder="Samsung"
+          placeholder="Apple, Dell, HP..."
           maxLength={30}
           {...form.getInputProps("brand")}
         />
         <TextInput
           label="Número de parte"
+          placeholder="12345, ABC-123..."
           maxLength={50}
           {...form.getInputProps("partNumber")}
         />

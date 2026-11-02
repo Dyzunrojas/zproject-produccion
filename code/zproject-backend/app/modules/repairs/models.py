@@ -12,13 +12,6 @@ if TYPE_CHECKING:
     from app.modules.client.models import Client
     from app.modules.sparePart.models import SparePartUsage
 
-RECEIVED = "recibido"
-DIAGNOSED = "diagnosticado"
-IN_REPAIR = "enReparacion"
-FINISHED = "finalizado"
-CANCELLED = "cancelado"
-
-
 class Device(Base):
     __tablename__ = "device"
 
