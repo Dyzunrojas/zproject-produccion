@@ -9,7 +9,9 @@ import {
 import { useForm } from "@mantine/form";
 import { useAsyncAction } from "../../hooks/useAsyncAction";
 import { createRepair, updateRepair } from "../../services/repairService";
-import type { ClientOption, Repair } from "../../types/repair";
+import type { Client } from "../../types/client";
+import type { Repair } from "../../types/repair";
+import { buildClientOptions } from "../../utils/clientOptions";
 import { FormActions } from "../molecules/FormActions";
 
 interface RepairFormValues {
@@ -27,7 +29,7 @@ interface RepairFormValues {
 
 interface RepairFormProps {
   repair: Repair | null;
-  clients: ClientOption[];
+  clients: Client[];
   onSaved: () => void;
   onCancel: () => void;
 }
@@ -102,13 +104,11 @@ function RepairForm({ repair, clients, onSaved, onCancel }: RepairFormProps) {
       <Stack>
         <Select
           label="Cliente"
-          placeholder="Selecciona un cliente"
+          placeholder="Escribe para buscar un cliente"
           searchable
+          nothingFoundMessage="No se encontraron clientes"
           disabled={repair !== null}
-          data={clients.map((client) => ({
-            value: String(client.id),
-            label: client.name,
-          }))}
+          data={buildClientOptions(clients, repair?.clientId)}
           {...form.getInputProps("clientId")}
         />
         <TextInput
@@ -172,7 +172,7 @@ function RepairForm({ repair, clients, onSaved, onCancel }: RepairFormProps) {
 interface RepairFormModalProps {
   opened: boolean;
   repair: Repair | null;
-  clients: ClientOption[];
+  clients: Client[];
   onClose: () => void;
   onSaved: () => void;
 }

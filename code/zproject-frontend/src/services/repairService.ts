@@ -1,6 +1,5 @@
 import { api } from "../api/client";
 import type {
-  ClientOption,
   Repair,
   RepairCreate,
   RepairDiagnosis,
@@ -52,10 +51,5 @@ export async function finalizeRepair(
     `/repairs/${id}/finalize`,
     payload,
   );
-  return data;
-}
-
-export async function getClientOptions(): Promise<ClientOption[]> {
-  const { data } = await api.get<ClientOption[]>("/clients");
   return data;
 }

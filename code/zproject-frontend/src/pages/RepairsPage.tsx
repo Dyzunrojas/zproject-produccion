@@ -10,8 +10,11 @@ import { RepairFormModal } from "../components/organisms/RepairFormModal";
 import { RepairStatusModal } from "../components/organisms/RepairStatusModal";
 import { useItemModal } from "../hooks/useItemModal";
 import { useLoad } from "../hooks/useLoad";
-import { getClientOptions, getRepairs } from "../services/repairService";
-import type { ClientOption, Repair } from "../types/repair";
+import { getClients } from "../services/clientService";
+import { getRepairs } from "../services/repairService";
+import type { Client } from "../types/client";
+import type { Repair } from "../types/repair";
+import { buildClientOptions } from "../utils/clientOptions";
 import { formatDate } from "../utils/format";
 import {
   filterStatusOptions,
@@ -26,7 +29,7 @@ export function RepairsPage() {
     loading,
     reload,
   } = useLoad(getRepairs, [] as Repair[]);
-  const { data: clients } = useLoad(getClientOptions, [] as ClientOption[]);
+  const { data: clients } = useLoad(getClients, [] as Client[]);
 
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
   const [clientFilter, setClientFilter] = useState<string | null>(null);
@@ -155,10 +158,8 @@ export function RepairsPage() {
           placeholder="Todos los clientes"
           clearable
           searchable
-          data={clients.map((client) => ({
-            value: String(client.id),
-            label: client.name,
-          }))}
+          nothingFoundMessage="No se encontraron clientes"
+          data={buildClientOptions(clients)}
           value={clientFilter}
           onChange={(value) =>
             setClientFilter(value === null ? null : String(value))

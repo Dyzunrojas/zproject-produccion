@@ -79,7 +79,5 @@ export interface RepairFinalizeResult {
   warning: string | null;
 }
 
-export interface ClientOption {
-  id: number;
-  name: string;
-}
+
+
