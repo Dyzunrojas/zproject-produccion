@@ -61,3 +61,7 @@ class MaterialUsage(Base):
 
     printOrder: Mapped["PrintOrder"] = relationship(back_populates="materialUsages")
     material: Mapped["Material"] = relationship()
+
+    @property
+    def materialName(self) -> str:
+        return f"{self.material.type} {self.material.color}"

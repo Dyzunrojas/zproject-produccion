@@ -14,14 +14,12 @@ import { ObjectFormModal } from "../components/organisms/ObjectFormModal";
 import { useAsyncAction } from "../hooks/useAsyncAction";
 import { useItemModal } from "../hooks/useItemModal";
 import { useLoad } from "../hooks/useLoad";
-import { getMaterials } from "../services/materialService";
 import {
   deleteObject,
   downloadStl,
   getPrintOrder,
   uploadStl,
 } from "../services/printOrderService";
-import type { Material } from "../types/material";
 import type { MaterialUsage, Object3D, PrintOrder } from "../types/printOrder";
 import { formatDate, formatGrams, formatMoney } from "../utils/format";
 import { notifyWarning } from "../utils/notify";
@@ -47,7 +45,6 @@ export function PrintOrderDetailPage() {
 
   const fetchOrder = useCallback(() => getPrintOrder(orderId), [orderId]);
   const { data: order, loading, reload } = useLoad<PrintOrder | null>(fetchOrder, null);
-  const { data: materials } = useLoad(getMaterials, [] as Material[]);
 
   const { busy, run } = useAsyncAction();
   const [dateOpened, dateHandlers] = useDisclosure(false);
@@ -108,11 +105,6 @@ export function PrintOrderDetailPage() {
     }
   };
 
-  const materialName = (materialId: number) => {
-    const material = materials.find((item) => item.id === materialId);
-    return material ? `${material.type} ${material.color}` : `Material #${materialId}`;
-  };
-
   const objectColumns: Column<Object3D>[] = [
     { header: "Nombre", render: (item) => item.name },
     {
@@ -165,7 +157,7 @@ export function PrintOrderDetailPage() {
   ];
 
   const usageColumns: Column<MaterialUsage>[] = [
-    { header: "Material", render: (usage) => materialName(usage.materialId) },
+    { header: "Material", render: (usage) => usage.materialName },
     { header: "Gramos usados", render: (usage) => formatGrams(Number(usage.gramsUsed)) },
   ];
 

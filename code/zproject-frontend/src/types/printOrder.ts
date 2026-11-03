@@ -15,6 +15,7 @@ export interface Object3DCreate {
 export interface MaterialUsage {
   id: number;
   materialId: number;
+  materialName: string;
   gramsUsed: number;
 }
 

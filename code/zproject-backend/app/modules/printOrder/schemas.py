@@ -27,7 +27,9 @@ class MaterialUsageCreate(BaseModel):
 class MaterialUsageResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
+    id: int
     materialId: int
+    materialName: str
     gramsUsed: float
 
 
