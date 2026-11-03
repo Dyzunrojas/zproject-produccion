@@ -12,6 +12,8 @@ const descriptions: Record<string, string> = {
   "/warranties": "Garantías de las reparaciones.",
   "/spareParts": "Repuestos disponibles y su uso.",
   "/repairs": "Recibe, diagnostica y finaliza reparaciones.",
+  "/clients": "Registra y consulta los datos de tus clientes.",
+  "/payments": "Registra los pagos de pedidos y reparaciones.",
 };
 
 export function HomePage() {
