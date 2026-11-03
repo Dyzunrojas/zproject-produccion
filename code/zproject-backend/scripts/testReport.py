@@ -14,8 +14,17 @@ from pathlib import Path
 resultsFile = Path(sys.argv[1] if len(sys.argv) > 1 else "results.xml")
 testDir = Path("test")
 
-MODULES = {"test_auth": "Autenticación", "test_material": "Materiales", "test_printOrder": "Pedidos 3D",
-    "test_client": "Clientes", "test_payment": "Pagos"}
+MODULES = {
+    "test_auth": "Autenticación",
+    "test_material": "Materiales",
+    "test_printOrder": "Pedidos 3D",
+    "test_client": "Clientes",
+    "test_payment": "Pagos",
+    "test_repairs": "Reparaciones",
+    "test_sparePart": "Repuestos",
+    "test_tool": "Herramientas",
+    "test_warranty": "Garantías"
+}
 
 
 def loadDocstrings() -> dict[tuple[str, str], str]:
