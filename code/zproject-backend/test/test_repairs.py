@@ -5,6 +5,7 @@ import pytest
 from fastapi import HTTPException
 
 from app.modules.order.enums import OrderStatus
+from app.modules.order import notifications
 from app.modules.order.schemas import OrderStatusUpdate
 from app.modules.repairs import service
 from app.modules.repairs.schemas import (
@@ -27,7 +28,7 @@ def sentEmails(monkeypatch):
         sent.append({"to": to, "subject": subject, "body": body})
         return None
 
-    monkeypatch.setattr(service, "sendEmail", fake)
+    monkeypatch.setattr(notifications, "sendEmail", fake)
     return sent
 
 
