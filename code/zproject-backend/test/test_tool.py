@@ -5,7 +5,7 @@ from fastapi.testclient import TestClient
 from app.core.dependencies import getDb
 from app.modules.tool import service
 from app.modules.tool.router import router as toolRouter
-from app.modules.tool.schemas import ToolCreate
+from app.modules.tool.schemas import ToolCreate, ToolUpdate
 
 
 @pytest.fixture()
@@ -96,3 +96,36 @@ def test_tool06_endpointSinPermisoDevuelve403(apiClient, makeUser, authHeader):
 
     assert denegado.status_code == 403
     assert permitido.status_code == 200
+
+
+def test_tool07_cantidadCeroNoPuedeEstarDisponible(db):
+    """Crear una herramienta con cantidad 0 y estado disponible.
+    Esperado: error 400 por datos incoherentes."""
+    with pytest.raises(HTTPException) as error:
+        service.createTool(
+            db, ToolCreate(name="SinStock", quantity=0, status="disponible")
+        )
+
+    assert error.value.status_code == 400
+
+
+def test_tool08_cantidadCeroEnMantenimientoEsValida(db):
+    """Crear una herramienta con cantidad 0 y estado mantenimiento.
+    Esperado: se crea, porque no promete unidades operativas."""
+    tool = service.createTool(
+        db, ToolCreate(name="EnMantenimiento", quantity=0, status="mantenimiento")
+    )
+
+    assert tool.id is not None
+    assert tool.status == "mantenimiento"
+
+
+def test_tool09_editarCantidadACeroConDisponibleFalla(db):
+    """Editar solo la cantidad a 0 de una herramienta disponible.
+    Esperado: error 400 usando el estado actual."""
+    tool = makeTool(db, name="Taladro", quantity=3, status="disponible")
+
+    with pytest.raises(HTTPException) as error:
+        service.updateTool(db, tool.id, ToolUpdate(quantity=0))
+
+    assert error.value.status_code == 400

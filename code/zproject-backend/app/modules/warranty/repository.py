@@ -32,6 +32,7 @@ def findActiveByRepairOrder(
         db.query(Warranty)
         .filter(Warranty.repairOrderId == repairOrderId)
         .filter(Warranty.isActive.is_(True))
+        .filter(Warranty.startDate <= today)
         .filter(Warranty.expirationDate >= today)
         .first()
     )

@@ -15,6 +15,11 @@ def getWarranties(
     fromDate: date | None = None,
     toDate: date | None = None,
 ) -> list[Warranty]:
+    if fromDate is not None and toDate is not None and fromDate > toDate:
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST,
+            "fromDate no puede ser posterior a toDate",
+        )
     return repository.getAll(db, repairOrderId, fromDate, toDate)
 
 

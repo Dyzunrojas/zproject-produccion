@@ -134,6 +134,7 @@ function WarrantyForm({ warranty, onSaved, onCancel }: WarrantyFormProps) {
           <TextInput
             label="Fecha de expiración"
             type="date"
+            min={form.values.startDate || undefined}
             {...form.getInputProps("expirationDate")}
           />
           <TextInput

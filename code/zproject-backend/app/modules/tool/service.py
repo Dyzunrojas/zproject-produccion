@@ -18,6 +18,8 @@ def getTool(db: Session, toolId: int) -> Tool:
 
 
 def createTool(db: Session, data: ToolCreate, force: bool = False) -> Tool:
+    checkQuantityStatus(data.quantity, data.status)
+
     existing = repository.findByName(db, data.name)
     if existing is not None and not force:
         raise HTTPException(
@@ -33,6 +35,10 @@ def updateTool(db: Session, toolId: int, data: ToolUpdate) -> Tool:
     tool = getTool(db, toolId)
 
     changes = data.model_dump(exclude_unset=True)
+    newQuantity = changes.get("quantity", tool.quantity)
+    newStatus = changes.get("status", tool.status)
+    checkQuantityStatus(newQuantity, newStatus)
+
     newName = changes.get("name")
     if newName is not None and newName.lower() != tool.name.lower():
         existing = repository.findByName(db, newName)
@@ -51,3 +57,11 @@ def deleteTool(db: Session, toolId: int) -> None:
     tool = getTool(db, toolId)
     tool.isActive = False
     repository.save(db, tool)
+
+
+def checkQuantityStatus(quantity: int, toolStatus: str) -> None:
+    if quantity == 0 and toolStatus in ("disponible", "en_uso"):
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST,
+            "Una herramienta sin unidades no puede estar disponible ni en uso",
+        )

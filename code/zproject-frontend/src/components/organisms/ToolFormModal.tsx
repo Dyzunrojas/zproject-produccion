@@ -51,7 +51,16 @@ function ToolForm({ tool, onSaved, onCancel }: ToolFormProps) {
         value === "" || Number(value) < 0 || !Number.isInteger(Number(value))
           ? "Debe ser un entero mayor o igual a 0"
           : null,
-      status: (value) => (value ? null : "Selecciona un estado"),
+      status: (value, values) => {
+        if (!value) return "Selecciona un estado";
+        if (
+          Number(values.quantity) === 0 &&
+          (value === "disponible" || value === "en_uso")
+        ) {
+          return "Sin unidades no puede estar disponible ni en uso";
+        }
+        return null;
+      },
     },
   });
 

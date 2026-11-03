@@ -151,3 +151,32 @@ def test_war08_endpointSinPermisoDevuelve403(apiClient, makeUser, authHeader):
 
     assert denegado.status_code == 403
     assert permitido.status_code == 200
+
+
+def test_war09_garantiaFuturaNoBloquea(db, makeRepair):
+    """Registrar una garantía que empieza en el futuro y luego una vigente.
+    Esperado: la futura no cuenta como vigente y la segunda se crea sin 409."""
+    repair = makeRepair()
+    future = service.createWarranty(
+        db,
+        WarrantyCreate(
+            repairOrderId=repair.id,
+            startDate=date(2030, 1, 1),
+            expirationDate=date(2031, 1, 1),
+            conditions="Garantía futura",
+        ),
+    )
+
+    actual = makeWarranty(db, repair.id)
+
+    assert actual.id is not None
+    assert actual.id != future.id
+
+
+def test_war10_filtrosInvertidosDevuelven400(db):
+    """Consultar garantías con fromDate posterior a toDate.
+    Esperado: error 400 en lugar de una lista vacía silenciosa."""
+    with pytest.raises(HTTPException) as error:
+        service.getWarranties(db, fromDate=date(2027, 1, 1), toDate=date(2026, 1, 1))
+
+    assert error.value.status_code == 400
