@@ -24,6 +24,8 @@ import {
 import type { Material } from "../types/material";
 import type { MaterialUsage, Object3D, PrintOrder } from "../types/printOrder";
 import { formatDate, formatGrams, formatMoney } from "../utils/format";
+import { notifyWarning } from "../utils/notify";
+import { validateStlFile } from "../utils/validators";
 
 function Info({ label, children }: { label: string; children: ReactNode }) {
   return (
@@ -75,6 +77,11 @@ export function PrintOrderDetailPage() {
   };
 
   const handleUpload = async (item: Object3D, file: File) => {
+    const problem = validateStlFile(file);
+    if (problem) {
+      notifyWarning(problem);
+      return;
+    }
     const ok = await run(() => uploadStl(orderId, item.id, file), `STL de "${item.name}" subido`);
     if (ok) reload();
   };

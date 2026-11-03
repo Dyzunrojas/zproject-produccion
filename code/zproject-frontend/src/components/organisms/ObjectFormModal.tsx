@@ -2,6 +2,7 @@ import { Modal, Stack, Textarea, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useAsyncAction } from "../../hooks/useAsyncAction";
 import { addObject } from "../../services/printOrderService";
+import { validateObjectName } from "../../utils/validators";
 import { FormActions } from "../molecules/FormActions";
 
 interface ObjectFormProps {
@@ -15,7 +16,7 @@ function ObjectForm({ orderId, onSaved, onCancel }: ObjectFormProps) {
   const form = useForm({
     initialValues: { name: "", description: "" },
     validate: {
-      name: (value) => (value.trim() ? null : "Ingresa el nombre del objeto"),
+      name: validateObjectName,
     },
   });
 

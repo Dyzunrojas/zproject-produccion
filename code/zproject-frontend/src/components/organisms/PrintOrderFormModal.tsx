@@ -16,6 +16,7 @@ import { useLoad } from "../../hooks/useLoad";
 import { getClients } from "../../services/clientService";
 import { createPrintOrder } from "../../services/printOrderService";
 import type { Client } from "../../types/client";
+import { validateObjectName } from "../../utils/validators";
 import { FormActions } from "../molecules/FormActions";
 
 interface PrintOrderFormValues {
@@ -55,7 +56,7 @@ function PrintOrderForm({ onSaved, onCancel }: PrintOrderFormProps) {
       totalAmount: (value) =>
         value !== "" && !(Number(value) >= 0) ? "Ingresa un monto válido" : null,
       objects: {
-        name: (value) => (value.trim() ? null : "Ingresa el nombre del objeto"),
+        name: validateObjectName,
       },
     },
   });
