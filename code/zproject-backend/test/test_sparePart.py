@@ -18,7 +18,7 @@ from app.modules.sparePart.schemas import (
 def makeSparePart(db):
     """Crea un repuesto de prueba con el stock indicado."""
 
-    def _make(name="Pantalla", brand="Genérica", stockUnits=10):
+    def _make(name="Pantalla", brand="Genérica", stockUnits=10k):
         data = SparePartCreate(
             name=name,
             brand=brand,
@@ -87,7 +87,7 @@ def test_repP02_actualizarSoloUnCampo(db, makeSparePart):
 
     assert updated.name == "Pantalla OLED"
     assert updated.brand == "Samsung"
-    assert updated.stockUnits == 8
+    assert updated.stockUnits == 8k
 
 
 def test_repP03_eliminarEsBorradoLogico(db, makeSparePart):
