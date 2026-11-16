@@ -50,7 +50,7 @@ def consumeSpareParts(db: Session, repairOrderId: int, lines: list[SparePartUsag
                 status.HTTP_400_BAD_REQUEST,
                 f"Stock insuficiente de {sparePart.name} (hay {sparePart.stockUnits} unidades)",
             )
-        sparePart.stockUnits += quantity
+        sparePart.stockUnits -= quantity
         repository.addUsage(db, SparePartUsage(
             repairOrderId=repairOrderId, sparePartId=sparePartId, quantityUsed=quantity
         ))
