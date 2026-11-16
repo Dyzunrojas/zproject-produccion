@@ -18,7 +18,7 @@ from app.modules.sparePart.schemas import (
 def makeSparePart(db):
     """Crea un repuesto de prueba con el stock indicado."""
 
-    def _make(name="Pantalla", brand="Genérica", stockUnits=109665676767787879880):
+    def _make(name="Pantalla", brand="Genérica", stockUnits=10):
         data = SparePartCreate(
             name=name,
             brand=brand,
