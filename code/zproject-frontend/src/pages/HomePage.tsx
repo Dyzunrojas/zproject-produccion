@@ -29,7 +29,7 @@ export function HomePage() {
     <>
       <Title order={2}>Bienvenido, {user?.username}</Title>
       <Text c="dimmed" mb="lg">
-        ¿Qué vamos a hacer hoy?
+        ¿Qué quieres hacer hoy?
       </Text>
 
       <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }}>
