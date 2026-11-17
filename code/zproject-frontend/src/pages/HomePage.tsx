@@ -20,19 +20,27 @@ export function HomePage() {
   const { user, hasPermission } = useAuth();
 
   const modules = navItems.filter(
-    (item) => item.path !== "/" && (item.permission === undefined || hasPermission(item.permission)),
+    (item) =>
+      item.path !== "/" &&
+      (item.permission === undefined || hasPermission(item.permission)),
   );
 
   return (
     <>
       <Title order={2}>Bienvenido, {user?.username}</Title>
       <Text c="dimmed" mb="lg">
-        ¿Qué quieres hacer hoy?
+        ¿Qué vamos a hacer hoy?
       </Text>
 
       <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }}>
         {modules.map((item) => (
-          <Card key={item.path} component={Link} to={item.path} withBorder padding="lg">
+          <Card
+            key={item.path}
+            component={Link}
+            to={item.path}
+            withBorder
+            padding="lg"
+          >
             <Text fw={700} c="brand.8">
               {item.label}
             </Text>
