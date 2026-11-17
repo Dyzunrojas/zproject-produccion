@@ -118,7 +118,7 @@ export function SparePartFormModal({
     <Modal
       opened={opened}
       onClose={onClose}
-      title={sparePart ? "Editar repuesto" : "Nuevo repuesto"}
+      title={sparePart ? "Editar repuesto Defensa" : "Nuevo repuesto"}
       centered
     >
       <SparePartForm
